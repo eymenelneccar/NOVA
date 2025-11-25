@@ -844,13 +844,5 @@
     "price": 5500,
     "imageUrl": "assets/images/1000262084_3_.png",
     "description": ""
-  },
-  {
-    "id": 1764089574465,
-    "name": "DD",
-    "category": "قهوة ساخنة",
-    "price": 0,
-    "imageUrl": "/assets/images/1764089564952-fast-food.png",
-    "description": ""
   }
 ]
