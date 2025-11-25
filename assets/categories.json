@@ -1,6 +1,42 @@
 [
   {
-    "name": "ايمن",
-    "imageUrl": ""
+    "name": "قهوة ساخنة",
+    "imageUrl": "assets/images/1000261908.png"
+  },
+  {
+    "name": "قهوة باردة",
+    "imageUrl": "assets/images/1000281586.png"
+  },
+  {
+    "name": "قهوة تركية",
+    "imageUrl": "assets/images/turkk.png"
+  },
+  {
+    "name": "شاي مثلج",
+    "imageUrl": "assets/images/1000281623.png"
+  },
+  {
+    "name": "فريز",
+    "imageUrl": "assets/images/1000281588.png"
+  },
+  {
+    "name": "الفطائر",
+    "imageUrl": "assets/images/fataer.png"
+  },
+  {
+    "name": "ساندويش",
+    "imageUrl": "assets/images/1000281670.png"
+  },
+  {
+    "name": "المخبوزات",
+    "imageUrl": "assets/images/1000259427.jpg"
+  },
+  {
+    "name": "عصائر طبيعية",
+    "imageUrl": "assets/images/1000281584.png"
+  },
+  {
+    "name": "سوبر شيك",
+    "imageUrl": "assets/images/1000281621.png"
   }
 ]

@@ -3,2039 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة الطعام الإلكترونية - العربة لاند</title>
-    <!-- تضمين Tailwind CSS -->
+    <title>مشروع مزاج</title>
+    <!-- Include Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- تضمين خط Cairo من Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- تضمين أيقونات Lucide (بديل لـ Font Awesome) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts for Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ثوابت ألوان وهوية العلامة */
-        :root {
-            --brand-1: #f97316; /* orange-500 */
-            --brand-2: #ea580c; /* orange-600 */
-            --brand-text: #fff7ed; /* orange-50 */
-            --brand-radial: rgba(255,255,255,0.12);
-        }
-        /* تحميل واعتماد خط MSjawhara من الملف المحلي */
-        @font-face {
-            font-family: 'MSjawhara';
-            src: url('MSjawhara-Bold.ttf') format('truetype');
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-        }
-        /* تعريف الخط الرئيسي */
+        /* Custom styles for the page */
         body {
-            font-family: 'MSjawhara', 'Cairo', sans-serif;
-            background-color: #f1f9f9; /* الخلفية الجديدة: رمادي كاشف/أبيض فاتح */
-            color: #18181b; /* لون النص الأساسي الداكن */
-            /* تمت إزالة الهيدر، لذلك لا حاجة لمسافة علوية ثابتة */
-        }
-        /* تصميم شريط التنقل الجانبي/العلوي */
-        #nav-sidebar {
-            transition: transform 0.3s ease;
-            color: var(--brand-text);
-            background:
-                radial-gradient(800px circle at 70% 20%, var(--brand-radial), transparent 60%),
-                linear-gradient(135deg, var(--brand-1), var(--brand-2));
-            box-shadow: 0 8px 24px rgba(0,0,0,0.20);
-        }
-        /* لإخفاء شريط التنقل على الشاشات الصغيرة مبدئياً */
-        @media (max-width: 768px) {
-            #nav-sidebar {
-                transform: translateX(100%); /* إخفاء إلى اليمين */
-                right: 0;
-            }
-            .sidebar-open #nav-sidebar {
-                transform: translateX(0); /* إظهار */
-            }
+            font-family: 'Cairo', sans-serif;
+            /* Using colors similar to the provided image */
+            background-color: #FDFBF8;
         }
 
-        /* تنسيق خاص لعربة التسوق (Sidebar) */
-        .cart-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 400px;
-            height: 100%;
-            background-color: #ffffff;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 100; /* أعلى من النافبار */
-            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-            color: #18181b;
-        }
-
-        .cart-sidebar.open {
-            transform: translateX(0);
-        }
-
-        /* تراكب السلة أعلى كل شيء بما في ذلك النافبار */
-        #cart-overlay { z-index: 90; }
-
-        /* إخفاء النافبار عندما تكون السلة مفتوحة لواجهة أنظف */
-        .cart-open #main-navbar { display: none; }
-
-        /* تنسيق لزر الإضافة (+) في زاوية الصورة */
-        .add-button-overlay {
+        /* This pseudo-element creates the decorative diamond shape at the top of the menu */
+        .decorative-column::before {
+            content: '';
             position: absolute;
-            bottom: 8px;
-            left: 8px;
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            background:
-                radial-gradient(80px circle at 50% 50%, var(--brand-radial), transparent 60%),
-                linear-gradient(135deg, var(--brand-1), var(--brand-2));
-            color: white;
-            cursor: pointer;
-            transition: background 0.2s, opacity 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            border: 2px solid #ffffff;
-            z-index: 10;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 80px;
+            height: 80px;
+            background-color: #FDFBF8;
+            border: 4px solid #EAE6E1;
+            z-index: 1;
         }
 
-        .add-button-overlay:hover {
-            opacity: 0.92;
+        /* This pseudo-element creates the inner color of the diamond shape */
+        .decorative-column::after {
+            content: '';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 56px;
+            height: 56px;
+            background-color: #F3F0EC;
+            z-index: 2;
         }
-
-        /* شاشة البدء (Splash Screen) */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #06343b;
-            direction: rtl;
-            background-color: #ffffff;
-            transition: opacity 0.35s ease;
-            will-change: opacity;
-        }
-        #splash-screen .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 1rem 1.25rem;
-        }
-        #splash-screen .logo {
-            width: min(64vw, 260px);
-            display: block;
-            margin: 0 auto;
-            filter: drop-shadow(0 8px 24px rgba(0,0,0,0.35));
-            animation: splashLogoPulse 1.2s ease-in-out infinite alternate;
-        }
-        #splash-screen .tagline {
-            margin-top: 0.75rem;
-            font-family: 'MSjawhara', 'Cairo', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            opacity: 0.9;
-        }
-        #splash-screen .bar {
-            margin: 1.25rem auto 0;
-            width: min(70vw, 320px);
-            height: 6px;
-            border-radius: 999px;
-            background-color: #e5e7eb;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-        }
-        #splash-screen .bar .fill {
-            height: 100%;
-            width: 0%;
-            background-color: #c0c0c0;
-            border-radius: inherit;
-            animation: splashProgressGrow 2.4s ease-out forwards;
-        }
-        @keyframes splashLogoPulse {
-            0% { transform: scale(0.96); opacity: 0.85; }
-            50% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.98); opacity: 0.95; }
-        }
-        @keyframes splashProgressGrow {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        /* نمط زر + الدائري الموحد لداخل البطاقات وصفوف الأحجام */
-        .add-circle-btn {
-             display: inline-flex;
-             align-items: center;
-             justify-content: center;
-             width: 28px; /* أصغر ليطابق ارتفاع كبسولة السعر */
-             height: 28px;
-             border-radius: 50%;
-             background:
-                 radial-gradient(60px circle at 50% 50%, var(--brand-radial), transparent 60%),
-                 linear-gradient(135deg, var(--brand-1), var(--brand-2));
-             color: #ffffff;
-             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-             border: 2px solid #ffffff;
-             padding: 0;
-             line-height: 1;
-             box-sizing: border-box;
-             flex-shrink: 0;
-             transition: background 0.2s, opacity 0.2s;
-         }
-        .add-circle-btn:hover {
-            opacity: 0.92;
-        }
-
-        /* تعميم التدرّج والوهج الشعاعي على الأزرار الصلبة */
-        #fab-cart-btn,
-        #scroll-top-btn,
-        #whatsapp-btn,
-        #preview-add-btn,
-        .add-to-cart-btn {
-            background:
-                radial-gradient(280px circle at 50% 50%, var(--brand-radial), transparent 60%),
-                linear-gradient(135deg, var(--brand-1), var(--brand-2));
-            color: #ffffff;
-        }
-        #fab-cart-btn:hover,
-        #scroll-top-btn:hover,
-        #whatsapp-btn:hover,
-        #preview-add-btn:hover,
-        .add-to-cart-btn:hover {
-            filter: brightness(1.06);
-        }
-
-        /* أزرار الكمية داخل السلة (تجنب زر الحذف الأحمر) */
-        button[onclick^="updateQuantity"] {
-            background:
-                radial-gradient(180px circle at 50% 50%, var(--brand-radial), transparent 60%),
-                linear-gradient(135deg, var(--brand-1), var(--brand-2));
-            color: #ffffff;
-            border: 2px solid #ffffff;
-        }
-        button[onclick^="updateQuantity"]:hover { filter: brightness(1.06); }
-
-        /* كبسولات الأحجام/الشرائح ذات الخلفية الداكنة إلى تدرّج الهوية */
-        span[class*="bg-[#06343b]"] {
-            background:
-                radial-gradient(180px circle at 50% 50%, var(--brand-radial), transparent 60%),
-                linear-gradient(135deg, var(--brand-1), var(--brand-2));
-            color: #ffffff;
-        }
-
-        /* شريط الأقسام الأفقي تحت البحث */
-        .category-bar {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding: 0.5rem;
-            background-color: rgba(245, 245, 220, 0.6);
-            border: 1px solid #e5e7eb; /* gray-200 */
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 8px 20px rgba(234, 88, 12, 0.08);
-        }
-        .category-bar::-webkit-scrollbar { height: 8px; }
-        .category-bar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 9999px; }
-
-        .nav-link { white-space: nowrap; }
-        /* إبراز العنصر النشط: حلقة داخلية وتكثيف التراكب بدلاً من تغيير الخلفية */
-        .nav-link.active {
-            box-shadow: inset 0 0 0 2px #ea580c, 0 8px 16px rgba(234, 88, 12, 0.18);
-            color: #ffffff !important;
-        }
-
-        /* تعديل الخلفيات والعناصر الداخلية لتناسب النمط الفاتح */
-        .header-bg {
-             background-color: #f1f9f9; 
-             border-bottom-color: #e0e0e0;
-        }
-        .cart-item-bg {
-             background-color: #f9f9f9; 
-             border-color: #e0e0e0;
-        }
-        .text-main {
-             color: #18181b; 
-        }
-
-        /* زر السلة والسهم العائمين على الهاتف */
-         @media (max-width: 640px) {
-            #fab-cart-btn {
-                position: fixed;
-                bottom: 80px; /* فوق الفوتر */
-                right: 16px;
-                z-index: 60;
-            }
-            #scroll-top-btn {
-                bottom: 80px; /* موازة السلة */
-                left: 16px;
-                z-index: 60; /* فوق الفوتر */
-            }
-        }
-        .text-green-600 { color: #ea580c !important; }
-        .hover\:text-green-700:hover { color: #c2410c !important; }
-        .bg-green-600 { background-color: #ea580c !important; }
-        .hover\:bg-green-700:hover { background-color: #c2410c !important; }
-        .border-green-600 { border-color: #ea580c !important; }
-        .fill-green-600 { fill: #ea580c !important; }
-
-        /* حالات النافبار: عائم فوق الهيرو ثم يثبت أعلى الصفحة عند التمرير */
-        #main-navbar {
-            transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
-        }
-        #main-navbar.navbar-floating {
-            position: absolute; top: 0; left: 0; right: 0;
-            color: #ffffff;
-            background: rgba(255,255,255, .10);
-            border-bottom: 1px solid rgba(255,255,255, .20);
-            -webkit-backdrop-filter: saturate(180%) blur(8px);
-            backdrop-filter: saturate(180%) blur(8px);
-        }
-         #main-navbar.navbar-stuck {
-             position: fixed; top: 0; left: 0; right: 0;
-             background: rgba(255,255,255, .94);
-             color: #ea580c !important;
-             border-bottom: 1px solid #e5e7eb;
-             box-shadow: 0 8px 20px rgba(234, 88, 12, .08);
-             z-index: 100;
-         }
-
-         /* بطاقات الفئات: صورة مع تراكب وتعزيز قابلية القراءة */
-        .category-card {
-            position: relative;
-            border-radius: 0.75rem; /* rounded-xl */
-            overflow: hidden;
-            transition: transform .25s ease, box-shadow .25s ease, opacity .4s ease;
-            opacity: 0; /* ستظهر عبر المراقِب */
-            transform: translateY(6px);
-            display: block;
-            min-height: 6.5rem; /* ضمان الارتفاع حتى بدون صورة */
-            background-color: #ffffff; /* خلفية افتراضية عند غياب الصورة */
-        }
-        @media (min-width: 640px) { .category-card { min-height: 7.5rem; } }
-        @media (min-width: 768px) { .category-card { min-height: 9rem; } }
-         .category-card.reveal { opacity: 1; transform: translateY(0); }
-         .category-card img { display: block; width: 100%; height: 6.5rem; object-fit: cover; }
-         @media (min-width: 640px) { .category-card img { height: 7.5rem; } }
-         @media (min-width: 768px) { .category-card img { height: 9rem; } }
-         .category-card .cat-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to top, rgba(234, 88, 12, .55), rgba(234, 88, 12, .32), rgba(234, 88, 12, 0));
-            transition: background .25s ease, opacity .25s ease;
-         }
-         .nav-link.active .cat-overlay {
-            background: linear-gradient(to top, rgba(234, 88, 12, .62), rgba(234, 88, 12, .38), rgba(234, 88, 12, 0));
-         }
-         .category-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(234, 88, 12, .12); }
-        .category-card:hover .cat-overlay {
-            background: linear-gradient(to top, rgba(234, 88, 12, .44), rgba(234, 88, 12, .22), rgba(234, 88, 12, 0));
-        }
-         .category-card .cat-title {
-             position: absolute; left: 0; right: 0; bottom: 0.5rem;
-             color: #ffffff; font-weight: 800; text-align: center;
-             text-shadow: 0 1px 2px rgba(0,0,0,.35);
-             padding: 0 0.5rem; font-size: .95rem;
-         }
-         @media (min-width: 640px) { .category-card .cat-title { font-size: 1rem; } }
-         @media (min-width: 768px) { .category-card .cat-title { font-size: 1.05rem; } }
-
-         /* شريط البحث: يفتح تحت النافبار وبنفس ارتفاعه */
-         #search-bar-panel { transition: height .2s ease; }
-         #search-bar-panel.search-open { display: flex; align-items: center; }
-
- 
-      </style>
-      <script>
-        // ربط Google Sheet عبر Apps Script (مقدَّم من المستخدم)
-        window.GS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxXY1tRMfsz-N5WCoiXSLgrR3GSYr12LORCMenxF5kxQihnTK7w8rC7F2bLYbqwQ_e4XA/exec';
-        // ضبط رقم واتساب الذي يستقبل الطلبات
-        window.BRANCH_CONFIG = window.BRANCH_CONFIG || {};
-        window.BRANCH_CONFIG.whatsapp = '9647734587101';
-        try { localStorage.setItem('restaurant_whatsapp_number', '9647734587101'); } catch (e) {}
-      </script>
+        
+        /* Hide decorative diamond shapes around the logo */
+        .decorative-column::before,
+        .decorative-column::after { content: none !important; display: none !important; }
+    </style>
 </head>
-<body>
-  <!-- شاشة البدء / سبلاش -->
-  <div id="splash-screen" role="dialog" aria-label="شاشة البدء">
-    <div class="content">
-      <img src="logo.png" alt="شعار العربة لاند" class="logo" />
-      <div class="bar" aria-hidden="true"><div class="fill"></div></div>
-    </div>
-  </div>
+<body class="text-stone-800">
 
-    <!-- الهيدر بهيرو مع نافبار شفاف فوقه -->
-    <header class="relative">
-        <div class="relative h-64 sm:h-80 lg:h-96 overflow-hidden rounded-b-2xl">
-            <video id="hero-video" class="absolute inset-0 w-full h-full object-cover" style="display:none" muted loop playsinline autoplay></video>
-            <img id="hero-image" src="assets/images/Al_Kalha_Restaurant-_-karar.jpg" alt="صورة الغلاف" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">
-            <div id="hero-overlay" class="absolute inset-0 bg-black/35"></div>
-            <img id="brand-logo" src="" alt="لوغو" class="absolute" style="display:none; z-index:60; top:56%; left:50%; width:128px; height:128px; transform:translate(-50%, -50%); border-radius:9999px; border:3px solid #fff; box-shadow:0 8px 24px rgba(0,0,0,.3); object-fit:cover" onerror="this.style.display='none'" />
-            <nav id="main-navbar" class="navbar-floating z-50">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-2 flex items-center justify-between relative">
-                    <div class="flex items-center gap-3">
-                        <span id="branch-name" class="text-lg sm:text-xl font-extrabold">العربة لاند</span>
-                        <a href="https://www.google.com/maps?q=33.36888885498047,43.78224563598633&z=17&hl=en" target="_blank" rel="noopener" class="inline-flex items-center p-1 rounded-lg hover:bg-white/15" title="الموقع">
-                            <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        </a>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button id="toggle-search-btn" class="p-2 rounded-lg hover:bg-white/15" title="بحث">
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                        </button>
-                        <a href="tel:" class="p-2 rounded-lg hover:bg-white/15" title="اتصال">
-                            <i data-lucide="phone" class="w-5 h-5"></i>
-                        </a>
-                        <!-- زر السلة في النافبار بدل الزر العائم -->
-                        <button id="navbar-cart-btn" type="button" aria-label="افتح السلة" class="p-2 rounded-lg hover:bg-white/15 relative" onclick="toggleCart(true)">
-                            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                            <span id="navbar-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">0</span>
-                        </button>
-                    </div>
-                    <!-- شريط البحث داخل النافبار -->
-                    <div id="navbar-search-overlay" class="hidden absolute inset-0 z-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-                        <div class="relative w-full max-w-xl mx-auto">
-                            <input type="text" id="search-input-navbar" oninput="filterItems()" placeholder="ابحث عن طبق..." class="w-full py-2 px-6 pl-12 rounded-xl bg-white/90 text-main placeholder-gray-600 border border-[#ea580c]/30 focus:ring-[#ea580c] focus:border-[#ea580c] transition" />
-                            <i data-lucide="search" class="w-5 h-5 text-gray-600 absolute top-1/2 left-4 transform -translate-y-1/2"></i>
-                        </div>
-                        <button id="navbar-search-close" aria-label="أغلق البحث" class="absolute right-6 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/80 hover:bg-white text-main shadow ring-1 ring-[#ea580c]/20">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
-            </nav>
-            <div class="absolute bottom-4 right-4 left-4 text-white">
-                <h1 class="text-2xl sm:text-3xl font-black drop-shadow-lg" id="hero-title">مرحبًا بكم</h1>
-            </div>
-        </div>
-    </header>
-
-    
-    <!-- محتوى القائمة الرئيسية -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-0">
-        <!-- شريط البحث المنسدل -->
-        <div id="search-bar-panel" class="mb-6 hidden">
-            <div class="relative">
-                <input type="text" id="search-input-mobile" oninput="filterItems()" placeholder="ابحث عن طبق..." class="w-full py-3 px-6 pr-12 rounded-xl bg-white text-main placeholder-gray-500 border border-gray-300 focus:ring-[#ea580c] focus:border-[#ea580c] transition">
-                <i data-lucide="search" class="w-5 h-5 text-gray-500 absolute top-1/2 left-4 transform -translate-y-1/2"></i>
-            </div>
-        </div>
-
-        <!-- شريط الأقسام تحت البحث (أفقي وأنيق) -->
-        <div class="mb-6">
-            <div class="category-bar">
-                <ul id="section-nav-list" class="flex items-start gap-2 text-gray-700 text-sm font-bold">
-                    <!-- يتم توليد الروابط بواسطة JS -->
-                </ul>
-            </div>
-        </div>
-
-        <!-- أزرار تبديل نمط العرض -->
-        <div class="flex items-center gap-2 mb-4" id="view-toggle">
-            <button id="btn-grid-view" class="p-2 rounded-lg border border-gray-300 text-main" title="شبكة">
-                <i data-lucide="grid" class="w-5 h-5"></i>
-            </button>
-            <button id="btn-list-view" class="p-2 rounded-lg border border-gray-300 text-main" title="قائمة">
-                <i data-lucide="list" class="w-5 h-5"></i>
+    <!-- Fixed Transparent Navbar -->
+    <nav class="fixed inset-x-0 top-0 z-50 bg-transparent backdrop-blur-sm">
+        <div class="max-w-5xl mx-auto px-2 h-10 flex items-center justify-between gap-2">
+            <div class="text-[0.75rem] font-extrabold tracking-widest text-stone-800">NOVΛ CAFE | مَشرُوع مَزاج</div>
+            <input id="nav-search-input" type="search" class="hidden bg-white/90 text-gray-900 rounded-md px-3 py-1 text-sm shadow focus:outline-none focus:ring-2 focus:ring-amber-500 min-w-0 w-44" />
+            <button id="nav-search-btn" aria-label="بحث" class="p-1 rounded-full hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-stone-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
             </button>
         </div>
+    </nav>
 
-        <div id="menu-content" class="md:pl-4 md:pt-6">
-            <!-- الأقسام والوجبات سيتم توليدها هنا بواسطة JS -->
-        </div>
+    <div class="container mx-auto max-w-lg min-h-[calc(100vh-40px)] relative flex flex-col items-center justify-center px-4">
+        
+        
 
-        <div id="no-results" class="text-center text-gray-500 py-12 hidden">
-            <i data-lucide="alert-octagon" class="w-12 h-12 mx-auto mb-4 text-[#ea580c]"></i>
-            <p class="text-2xl font-bold">عفواً، لا توجد نتائج مطابقة.</p>
-            <p class="text-lg">يرجى المحاولة بكلمات بحث مختلفة.</p>
-        </div>
-
-    </main>
-
-    <!-- تم إزالة الفوتر الثابت والزر العائم للسلة بناءً على الطلب -->
-
-    <!-- نافذة عربة التسوق الجانبية (Cart Popup) -->
-    <div id="cart-sidebar" class="cart-sidebar">
-        <div class="p-6 h-full flex flex-col">
-            <div class="flex justify-between items-center border-b border-gray-300 pb-4 mb-4">
-                <h2 class="text-3xl font-extrabold text-main">اطلع على سلتك</h2>
-                <button id="close-cart-btn" class="p-2 rounded-full hover:bg-gray-100 transition">
-                    <i data-lucide="x" class="w-6 h-6 text-main"></i>
-                </button>
-            </div>
-            <div id="order-branch-line" class="text-sm text-gray-600 mb-3">
-                الطلب من <span id="order-branch-label"></span>
-            </div>
-
-            <!-- جسم السلة قابل للتمرير بالكامل -->
-            <div id="cart-body" class="flex-1 overflow-y-auto space-y-4 pr-1">
-                <div id="cart-items-list" class="space-y-4">
-                    <!-- عناصر السلة تظهر هنا -->
+        <!-- Main Content: The Menu -->
+        <main class="px-4">
+            <!-- Central Decorative Column -->
+            <div class="decorative-column relative bg-[#F3F0EC] border-x-4 border-[#EAE6E1] rounded-lg mx-auto">
+                
+                <!-- Logo at the top of the column -->
+                <div class="absolute -top-14 left-1/2 -translate-x-1/2 w-32 h-32 bg-white rounded-full flex items-center justify-center border-2 border-gray-200 shadow-sm z-10 p-1">
+                    <!-- ملاحظة: هذا المسار يعمل فقط إذا كان الملف موجوداً على جهاز الكمبيوتر المحلي -->
+                    <img src="veiw/logo.png" alt="شعار" class="w-[85%] h-[85%] object-contain rounded-full">
                 </div>
 
-                <!-- رسالة السلة الفارغة -->
-                <div id="empty-cart-message" class="text-center text-gray-500 py-12 hidden">
-                    <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto mb-4 text-[#ea580c]"></i>
-                    <p class="text-lg font-semibold">عربتك فارغة حالياً.</p>
-                    <p class="text-sm">أضف بعض الأطباق الشهية!</p>
-                </div>
+                <!-- Menu Selection -->
+                <div class="pt-24 p-6 flex flex-col items-center min-h-[300px] justify-center">
 
-                <!-- ملاحظة الزبون -->
-                <div id="customer-note-section" class="">
-                    <label for="customer-note" class="block text-sm font-bold text-main mb-2">ملاحظة الزبون</label>
-                    <textarea id="customer-note" rows="3" placeholder="اكتب أي ملاحظة للطلب هنا..."
-                        class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-[#ea580c] focus:border-[#ea580c] text-main placeholder-gray-400"></textarea>
-                </div>
-
-                <!-- معلومات الزبون -->
-                <div id="customer-info-section" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="col-span-1">
-                        <label for="customer-name" class="block text-sm font-bold text-main mb-1">الاسم</label>
-                        <input id="customer-name" type="text" placeholder="اكتب اسمك"
-                               class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-[#ea580c] focus:border-[#ea580c] text-main placeholder-gray-400" />
+                    <div class="w-full max-w-xs space-y-4">
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            حي الحسين
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            جامعة الزهراء
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            جامعة الوارث
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            مبيعات الجملة
+                        </button>
                     </div>
-                    <div class="col-span-1">
-                        <label for="customer-phone" class="block text-sm font-bold text-main mb-1">الرقم</label>
-                        <input id="customer-phone" type="tel" inputmode="tel" placeholder="اكتب رقم هاتفك"
-                               class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-[#ea580c] focus:border-[#ea580c] text-main placeholder-gray-400" />
-                    </div>
-
-                    <!-- تم حذف حقول نوع الطلب ونوع عملية الشراء من السلة -->
-
-                <!-- العنوان يظهر تحت نوع الطلب عند اختيار إرسال إلى العنوان -->
-                <div class="col-span-1 sm:col-span-2" id="delivery-address-wrapper">
-                    <label for="delivery-address" class="block text-sm font-bold text-main mb-1">العنوان</label>
-                    <input id="delivery-address" type="text" placeholder="اكتب عنوانك بالتفصيل"
-                           class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-[#06343b] focus:border-[#06343b] text-main placeholder-gray-400" />
-                    <p class="text-xs text-gray-500 mt-1">مثال: الشارع، البيت/العمارة، أقرب نقطة دالة</p>
                 </div>
 
-                <div class="col-span-1 sm:col-span-2" id="customer-area-wrapper">
-                    <label for="customer-area" class="block text-sm font-bold text-main mb-1">المحافظة</label>
-                    <select id="customer-area" class="w-full p-3 rounded-xl border border-gray-300 bg-gray-50 focus:ring-[#ea580c] focus:border-[#ea580c] text-main">
-                        <option value="">اختر المحافظة</option>
-                    </select>
-                    <div id="governorate-fee" class="text-xs text-gray-500 mt-1">أجور الشحن: —</div>
-                </div>
             </div>
+        </main>
+        
+        <!-- Footer Section -->
+        <footer class="text-center py-4">
+            <p class="text-sm text-stone-500">© 2025 جميع الحقوق محفوظة NOVΛ CAFE</p>
+        </footer>
 
-                <div id="cart-summary" class="border-t border-gray-300 pt-4">
-
-                    <div class="flex justify-between items-center text-xl font-bold mb-4">
-                        <span>الإجمالي:</span>
-                        <span id="cart-total" class="text-[#ea580c]">0 د.ع</span>
-                    </div>
-                    <button id="whatsapp-btn" class="w-full py-3 bg-[#ea580c] hover:bg-[#ea580c] text-white font-bold text-lg rounded-xl transition shadow-lg" onclick="sendOrderViaWhatsApp()">
-                        إرسال الطلب <i data-lucide="message-circle" class="inline w-5 h-5 ml-2"></i>
-                    </button>
-                    <div class="text-center my-2 text-sm text-gray-500">or</div>
-                    <button id="call-btn" class="w-full py-3 bg-gray-400 hover:bg-gray-500 text-white font-bold text-lg rounded-xl transition" onclick="orderViaCall()">
-                        اطلب عبر اتصال <i data-lucide="phone" class="inline w-5 h-5 ml-2"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- overlay لعربة التسوق -->
-    <div id="cart-overlay" class="fixed inset-0 bg-black opacity-50 z-40 hidden" onclick="toggleCart(false)"></div>
-
-    <!-- تم حذف زر العودة للأعلى -->
-
-    <!-- زر السلة أصبح ضمن الفوتر الثابت -->
-
-    <!-- مودال معاينة المنتج -->
-    <div id="item-preview-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
-    <div id="item-preview-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="relative">
-                <img id="preview-img" src="" alt="" class="w-full h-56 object-cover cursor-pointer" onerror="this.style.display='none'">
-                <button id="preview-close-btn" class="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white shadow">
-                    <i data-lucide="x" class="w-5 h-5 text-main"></i>
-                </button>
-            </div>
-            <div class="p-4">
-                <h3 id="preview-name" class="text-xl font-extrabold text-main mb-2"></h3>
-                <p id="preview-desc" class="text-sm text-gray-600 mb-3"></p>
-                <div id="preview-variants" class="flex flex-col gap-2 mb-3"></div>
-                <div class="flex items-center justify-between">
-                <span id="preview-price" class="text-lg font-black text-[#ea580c]"></span>
-                <button id="preview-add-btn" class="px-4 py-2 bg-[#ea580c] hover:bg-[#ea580c] text-white rounded-xl font-bold shadow">
-                        أضف إلى السلة
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- مودال معاينة الصورة (ليبت بوكس) -->
-    <div id="image-lightbox-overlay" class="fixed inset-0 bg-black/70 z-50 hidden" style="z-index: 1000;"></div>
-    <div id="image-lightbox-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" style="z-index: 1001;">
-      <div class="relative">
-        <img id="lightbox-img" src="" alt="" class="max-w-[90vw] max-h-[80vh] rounded-2xl shadow-2xl" onerror="this.style.display='none'">
-        <button id="image-lightbox-close" class="absolute -top-3 -right-3 p-2 rounded-full bg-white/90 hover:bg-white shadow">
-          <i data-lucide="x" class="w-5 h-5 text-main"></i>
-        </button>
-      </div>
+    <!-- Modal (disabled) -->
+    <div id="orderTypeModal" class="hidden">
     </div>
 
     <script>
-        // دالة للمرور السلس إلى القسم
-        const scrollToSection = (id) => {
-            const element = document.getElementById(id);
-            const headerElement = document.querySelector('header');
-            const headerHeight = headerElement ? headerElement.offsetHeight : 0; // لا تعويض إذا لا يوجد هيدر
-
-            if (element) {
-                // 1. في حال كان هناك شريط جانبي سابقاً، أغلقه بأمان إن وجد
-                document.body.classList.remove('sidebar-open');
-                const overlayEl = document.getElementById('sidebar-overlay');
-                if (overlayEl) overlayEl.classList.add('hidden');
-                
-                // 2. حساب وتطبيق التمرير مع تعويض الهيدر الثابت
-                const yPosition = element.getBoundingClientRect().top + window.pageYOffset;
-                
-                window.scrollTo({
-                    // تعويض ارتفاع الهيدر (وهو 5rem أو ~80px) بالإضافة إلى مسافة صغيرة (5px)
-                    top: yPosition - headerHeight - 5, 
-                    behavior: 'smooth'
-                });
-                
-                // 3. تفعيل رابط التنقل فوراً عند النقر
-                const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => link.classList.remove('active'));
-                const activeLink = document.querySelector(`.nav-link[data-section-id="${id}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                }
-            }
+        const locationButtons = document.querySelectorAll('.location-button');
+        const modal = document.getElementById('orderTypeModal');
+        const modalBox = document.getElementById('modalBox');
+        const modalTitle = document.getElementById('modal-title');
+        const closeModalButton = document.getElementById('closeModal');
+        const orderTypeButtons = modal.querySelectorAll('.space-y-3 button');
+    
+        const openModal = (title) => {
+            modalTitle.textContent = title;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // A small delay to ensure transition is applied correctly
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalBox.classList.remove('scale-95', 'opacity-0');
+            }, 10);
         };
-
-        // ------------------ بيانات القائمة (من الأصول/التخزين) ------------------
-        const STORAGE_KEY_MENU = 'menu_assets';
-        const CATS_IMAGES_KEY = 'menu_category_images';
-        let categoryImagesMap = {};
-        let menuData = [];
-        let viewMode = localStorage.getItem('view_mode') || 'grid';
-
-        async function loadMenuItemsFromAssetsOrStorage() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY_MENU);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed)) return parsed;
-                }
-            } catch {}
-            try {
-                const resp = await fetch('assets/menu.json', { cache: 'no-store' });
-                if (resp.ok) {
-                    const data = await resp.json();
-                    if (Array.isArray(data)) return data;
-                }
-            } catch (e) {
-                console.warn('تعذّر تحميل الأصول', e);
-            }
-            return [];
-        }
-
-        function buildSections(items) {
-            const groups = {};
-            items.forEach(it => {
-                const cat = (it.category || 'أخرى').trim();
-                if (!groups[cat]) groups[cat] = [];
-                const type = (it.type || 'item');
-                if (type === 'heading') {
-                    groups[cat].push({
-                        id: it.id,
-                        type: 'heading',
-                        name: it.name || '',
-                        desc: '',
-                        price: 0,
-                        img: ''
-                    });
+    
+        const closeModal = () => {
+            modal.classList.add('opacity-0');
+            modalBox.classList.add('scale-95', 'opacity-0');
+            // Wait for transition to finish before hiding
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300); // Must match transition duration
+        };
+    
+        locationButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const branch = button.textContent.trim();
+                if (branch === 'حي الحسين') {
+                    window.location.href = './hy-alhusin-sfry.html';
+                } else if (branch === 'جامعة الزهراء') {
+                    window.location.href = './hy-elz-sfry.html';
+                } else if (branch === 'جامعة الوارث') {
+                    window.location.href = './hy-wars-sfry.html';
+                } else if (branch === 'مبيعات الجملة') {
+                    const phone = '96407736427608';
+                    const message = 'مرحبا NOVA, أحتاج أسعار الجملة.';
+                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                    window.location.href = url;
                 } else {
-                    const variants = Array.isArray(it.variants) ? it.variants.map(v => ({
-                        key: String(v.key || '').trim() || String(v.label || '').trim(),
-                        label: String(v.label || '').trim() || String(v.key || '').trim(),
-                        price: Number(v.price) || 0,
-                        variantType: String(v.variantType || '').trim()
-                    })).filter(v => v.price > 0) : [];
-                    const basePrice = variants.length ? Math.min(...variants.map(v => v.price)) : (Number(it.price) || 0);
-                    groups[cat].push({
-                        id: it.id,
-                        type: 'item',
-                        name: it.name,
-                        desc: it.description || '',
-                        price: basePrice,
-                        img: (it.imageUrl || '').trim(),
-                        variants
-                    });
+                    window.location.href = './hy-alhusin-sfry.html';
                 }
             });
-            return Object.keys(groups).map(cat => ({
-                id: cat.toLowerCase().replace(/\s+/g, '-'),
-                title: cat,
-                items: groups[cat]
-            }));
-        }
-
-        // ------------------ إدارة حالة السلة (localStorage) ------------------
-        let cart = [];
-        // المحافظات وأجور الشحن
-        let governorates = [];
-        let governoratesMap = {};
-        const isGovsEnabled = () => localStorage.getItem('menu_governorates_enabled') === '1';
-        const updateGovernorateFeeDisplay = (selectedName) => {
-            const feeEl = document.getElementById('governorate-fee');
-            const fee = isGovsEnabled() ? (governoratesMap[selectedName] || 0) : 0;
-            if (feeEl) {
-                feeEl.style.display = isGovsEnabled() ? 'block' : 'none';
-                if (isGovsEnabled()) feeEl.textContent = `أجور الشحن: ${fee ? fee.toLocaleString('ar-IQ') + ' د.ع' : '—'}`;
-            }
-            const shippingLineEl = document.getElementById('shipping-fee-line');
-            if (shippingLineEl) {
-                shippingLineEl.style.display = isGovsEnabled() ? '' : 'none';
-                if (isGovsEnabled()) shippingLineEl.textContent = fee ? `${fee.toLocaleString('ar-IQ')} د.ع` : '—';
-            }
-        };
-        async function loadGovernorates() {
-            if (!isGovsEnabled()) { governorates = []; governoratesMap = {}; return; }
-            // المحاولة أولاً من التخزين المحلي (لوحة التحكم)
-            try {
-                const raw = localStorage.getItem('menu_governorates');
-                if (raw) {
-                    const arr = JSON.parse(raw);
-                    if (Array.isArray(arr)) {
-                        governorates = arr.map(g => ({
-                            name: String((g.name || '')).trim(),
-                            shippingFee: Number(g.fee ?? g.shippingFee) || 0
-                        })).filter(g => g.name);
-                    }
-                }
-            } catch (e) {
-                console.warn('تعذر قراءة المحافظات من التخزين المحلي', e);
-            }
-
-            // إن لم تتوفر محلياً، نحمّلها من ملف الأصول
-            if (!Array.isArray(governorates) || governorates.length === 0) {
-                try {
-                    const resp = await fetch('assets/governorates.json', { cache: 'no-store' });
-                    if (resp.ok) {
-                        const data = await resp.json();
-                        if (Array.isArray(data)) {
-                            governorates = data.map(g => ({
-                                name: String((g.name || '')).trim(),
-                                shippingFee: Number(g.fee ?? g.shippingFee) || 0
-                            })).filter(g => g.name);
-                        }
-                    }
-                } catch (e) {
-                    console.warn('فشل تحميل المحافظات من الأصول', e);
-                }
-            }
-
-            // بناء الخريطة للاستخدام السريع
-            governoratesMap = {};
-            governorates.forEach(g => { governoratesMap[g.name] = g.shippingFee; });
-        }
-
-        const loadCart = () => {
-            const savedCart = localStorage.getItem('restaurant_menu_cart');
-            if (savedCart) {
-                try {
-                    cart = JSON.parse(savedCart);
-                } catch (e) {
-                    console.error("Failed to parse cart from localStorage:", e);
-                    cart = [];
-                }
-            }
-        };
-
-        const saveCart = () => {
-            localStorage.setItem('restaurant_menu_cart', JSON.stringify(cart));
-        };
-
-        const updateCartDisplay = () => {
-            const cartCountElement = document.getElementById('cart-count');
-            const navbarCartCountEl = document.getElementById('navbar-cart-count');
-            const cartListElement = document.getElementById('cart-items-list');
-            const cartTotalElement = document.getElementById('cart-total');
-            const emptyMessageElement = document.getElementById('empty-cart-message');
-
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const subtotalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-            if (cartCountElement) cartCountElement.textContent = totalItems;
-            if (navbarCartCountEl) navbarCartCountEl.textContent = totalItems;
-
-            let shippingFee = 0;
-            try {
-                const infoRaw = localStorage.getItem('restaurant_customer_info');
-                const info = infoRaw ? JSON.parse(infoRaw) : {};
-                const isDelivery = (info.orderType || 'إرسال إلى العنوان') === 'إرسال إلى العنوان';
-                if (isDelivery && isGovsEnabled()) {
-                    const areaName = info.area || '';
-                    shippingFee = governoratesMap[areaName] || 0;
-                }
-            } catch {}
-            const finalTotal = subtotalPrice + shippingFee;
-
-            cartTotalElement.textContent = `${finalTotal.toLocaleString('ar-IQ')} د.ع`;
-            
-            // تحديث رسالة السلة الفارغة
-            if (cart.length === 0) {
-                emptyMessageElement.classList.remove('hidden');
-                cartListElement.innerHTML = '';
-            } else {
-                emptyMessageElement.classList.add('hidden');
-            }
-
-            // تحديث قائمة عناصر السلة
-            cartListElement.innerHTML = cart.map(item => `
-                <div class="flex justify-between items-center cart-item-bg p-3 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex items-center space-x-3 space-x-reverse">
-                        <img src="${item.img || ''}" alt="${item.name}" class="w-12 h-12 object-cover rounded-md" onerror="this.style.display='none'" style="${item.img ? '' : 'display:none;'}">
-                        <div>
-                            <p class="font-bold text-main text-sm">${item.name}</p>
-                            ${item.variantLabel ? `<p class=\"text-xs text-gray-500\">الحجم: ${item.variantLabel}${item.variantType ? ' — ' + item.variantType : ''}</p>` : ''}
-                            <p class="text-xs text-gray-500">${item.price.toLocaleString('ar-IQ')} د.ع للوحدة</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3 space-x-reverse">
-                        <button onclick="updateQuantity('${item.uid}', -1)" class="p-1 rounded-full bg-[#ea580c] hover:bg-[#ea580c] transition">
-                            <i data-lucide="minus" class="w-4 h-4 text-white"></i>
-                        </button>
-                        <span class="font-bold text-lg text-main">${item.quantity}</span>
-                        <button onclick="updateQuantity('${item.uid}', 1)" class="p-1 rounded-full bg-[#ea580c] hover:bg-[#ea580c] transition">
-                            <i data-lucide="plus" class="w-4 h-4 text-white"></i>
-                        </button>
-                        <button onclick="removeItemFromCart('${item.uid}')" class="p-1 rounded-full bg-red-500 hover:bg-red-600 transition" title="حذف">
-                            <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-            // إعادة تفعيل أيقونات Lucide داخل السلة
-            lucide.createIcons();
-        };
-
-        const addItemToCart = (itemId, variantKey = null, sourceEl = null) => {
-            // البحث عن العنصر في جميع أقسام القائمة
-            const item = menuData.flatMap(section => section.items).find(i => i.id === itemId);
-            if (!item) return;
-
-            let unitPrice = item.price || 0;
-            let variantLabel = null;
-            let variantType = null;
-            let uid = String(itemId);
-
-            if (variantKey && Array.isArray(item.variants)) {
-                const v = item.variants.find(v => String(v.key) === String(variantKey));
-                if (v) {
-                    unitPrice = Number(v.price) || unitPrice;
-                    variantLabel = v.label || String(variantKey);
-                    variantType = v.variantType || null;
-                    uid = `${itemId}:${String(variantKey)}`;
-                }
-            }
-
-            const existingItem = cart.find(i => i.uid === uid);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    uid,
-                    id: itemId,
-                    name: item.name,
-                    img: item.img || '',
-                    price: unitPrice,
-                    quantity: 1,
-                    variantLabel,
-                    variantType
-                });
-            }
-
-            saveCart();
-            updateCartDisplay();
-
-            // تغذية راجعة فورية: تحويل علامة + إلى صح مؤقتًا
-            try {
-                if (sourceEl) {
-                    // تبديل الأيقونة إلى صح
-                    sourceEl.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white"></i>';
-                    if (window.lucide && typeof lucide.createIcons === 'function') {
-                        lucide.createIcons();
-                    }
-                    // تغيير الخلفية مؤقتًا
-                    const originalBg = sourceEl.style.backgroundColor;
-                    sourceEl.style.backgroundColor = '#ea580c';
-                    setTimeout(() => {
-                        // إعادة الأيقونة إلى + وإرجاع الخلفية الأصلية
-                        sourceEl.innerHTML = '<i data-lucide="plus" class="w-4 h-4 text-white"></i>';
-                        sourceEl.style.backgroundColor = originalBg || '#ea580c';
-                        if (window.lucide && typeof lucide.createIcons === 'function') {
-                            lucide.createIcons();
-                        }
-                    }, 1000);
-                }
-            } catch (e) {}
-
-            console.log(`تم إضافة ${item.name}${variantLabel ? ' (' + variantLabel + ')' : ''} إلى السلة.`);
-        };
-        
-        const updateQuantity = (uid, change) => {
-            const itemIndex = cart.findIndex(i => i.uid === uid);
-
-            if (itemIndex > -1) {
-                cart[itemIndex].quantity += change;
-
-                if (cart[itemIndex].quantity <= 0) {
-                    cart.splice(itemIndex, 1); // إزالة العنصر إذا كانت الكمية صفر أو أقل
-                }
-
-                saveCart();
-                updateCartDisplay();
-            }
-        }
-
-        const removeItemFromCart = (uid) => {
-            const idx = cart.findIndex(i => i.uid === uid);
-            if (idx > -1) {
-                cart.splice(idx, 1);
-                saveCart();
-                updateCartDisplay();
-            }
-        };
-
-        const checkout = () => {
-            if (cart.length > 0) {
-                const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                let shippingFee = 0;
-                try {
-                    const info = JSON.parse(localStorage.getItem('restaurant_customer_info') || '{}') || {};
-                    const isDelivery = (info.orderType || 'إرسال إلى العنوان') === 'إرسال إلى العنوان';
-                    if (isDelivery) shippingFee = governoratesMap[info.area || ''] || 0;
-                } catch {}
-                const total = subtotal + shippingFee;
-                const noteEl = document.getElementById('customer-note');
-                const noteText = noteEl ? (noteEl.value || '').trim() : '';
-                const customerInfo = JSON.parse(localStorage.getItem('restaurant_customer_info') || '{}');
-                // تم استبدال alert بنص يظهر في الكونسول لتجنب مشاكل الـ iframe
-                console.log(
-                    `جارٍ إتمام طلبك بقيمة: ${total.toLocaleString('ar-IQ')} د.ع.` +
-                    `\nالاسم: ${customerInfo.name || '—'}` +
-                    `\nالرقم: ${customerInfo.phone || '—'}` +
-                    `\nنوع الشراء: ${customerInfo.purchaseType || 'نقد'}` +
-                    `\nنوع الطلب: ${customerInfo.orderType || 'إرسال إلى العنوان'}` +
-                    `\nالعنوان: ${customerInfo.address || '—'}` +
-                    `\nالمنطقة: ${customerInfo.area || '—'}` +
-                    `\nملاحظة الزبون: ${noteText || 'بدون'}` +
-                    `\nشكراً لطلبك!`
-                );
-                
-                // بدلاً من alert()، يمكن استخدام رسالة UI مؤقتة هنا إذا أردت.
-                // حاليًا سأكتفي بمسح السلة وإغلاق النافذة.
-                
-                cart = []; // إفراغ السلة
-                saveCart();
-                updateCartDisplay();
-                toggleCart(false);
-                if (noteEl) { noteEl.value = ''; localStorage.removeItem('restaurant_menu_cart_note'); }
-            } else {
-                console.log('عربة التسوق فارغة. يرجى إضافة عناصر أولاً.');
-            }
-        };
-        
-        // تم تعديل وظيفة checkout لتجنب استخدام alert() وفقًا لتعليمات المنصة.
-
-        // ------------------ واجهة المستخدم (UI) ------------------
-
-        // دالة لعرض/إخفاء نافذة السلة الجانبية
-        const toggleCart = (show) => {
-            const cartSidebar = document.getElementById('cart-sidebar');
-            const cartOverlay = document.getElementById('cart-overlay');
-            if (show) {
-                cartSidebar.classList.add('open');
-                cartOverlay.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // منع التمرير في الخلفية
-                document.body.classList.add('cart-open'); // إخفاء النافبار أثناء فتح السلة
-            } else {
-                cartSidebar.classList.remove('open');
-                cartOverlay.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                document.body.classList.remove('cart-open');
-            }
-        };
-
-        const fabCartBtn = document.getElementById('fab-cart-btn'); if (fabCartBtn) fabCartBtn.addEventListener('click', () => toggleCart(true));
-        document.getElementById('close-cart-btn').addEventListener('click', () => toggleCart(false));
-
-        // إعداد وضبط الفرع من قاعدة البيانات ثم إعداد سطر الفرع
-        async function loadBranchConfigAndApply() {
-            const defaultKey = 'najaf';
-            const params = new URLSearchParams(window.location.search);
-            const key = params.get('branch') || localStorage.getItem('restaurant_branch') || defaultKey;
-            try {
-                const resp = await fetch('assets/branches.json', { cache: 'no-store' });
-                if (resp.ok) {
-                    const data = await resp.json();
-                    const cfg = data[key] || data[defaultKey] || {};
-                    window.BRANCH_CONFIG = cfg;
-                    // تحديث اسم الفرع في الهيدر
-                    const headerBranchEl = document.getElementById('branch-name');
-                    if (headerBranchEl && cfg.name) headerBranchEl.textContent = cfg.name;
-                    // تحديث زر الاتصال في الهيدر
-                    const headerTelLink = document.querySelector('header a[href^="tel:"]');
-                    if (headerTelLink && cfg.phone) headerTelLink.href = `tel:${cfg.phone}`;
-                    // حفظ الأرقام في التخزين المحلي لاستخدامها لاحقاً
-                    if (cfg.phone) localStorage.setItem('restaurant_phone_number', String(cfg.phone));
-                    if (cfg.whatsapp) localStorage.setItem('restaurant_whatsapp_number', String(cfg.whatsapp));
-                }
-            } catch (e) {
-                console.warn('تعذر تحميل إعداد الفرع', e);
-            }
-            applyLocalSettings();
-            // إعداد سطر اسم الفرع أعلى الفاتورة الآن
-            const labelEl = document.getElementById('order-branch-label');
-            const headerNameEl = document.getElementById('branch-name') || document.querySelector('header .text-xs.text-gray-600');
-            const branchText = headerNameEl ? headerNameEl.textContent.trim() : '';
-            if (labelEl) {
-                if (branchText) {
-                    labelEl.textContent = branchText;
-                    const lineEl = document.getElementById('order-branch-line');
-                    if (lineEl) lineEl.classList.remove('hidden');
-                } else {
-                    const lineEl = document.getElementById('order-branch-line');
-                    if (lineEl) lineEl.classList.add('hidden');
-                }
-            }
-        }
-        function applyLocalSettings() {
-            try {
-              const savedName = localStorage.getItem('restaurant_menu_name') || '';
-              const headerEl = document.getElementById('branch-name');
-              if (headerEl && savedName) headerEl.textContent = savedName;
-            } catch {}
-            try {
-              const savedPhone = localStorage.getItem('restaurant_phone_number') || '';
-              const telLink = document.querySelector('header a[href^="tel:"]');
-              if (telLink && savedPhone) telLink.href = `tel:${savedPhone}`;
-            } catch {}
-            try {
-              const logo = localStorage.getItem('restaurant_logo_url') || '';
-              const logoEl = document.getElementById('brand-logo');
-              if (logoEl) { if (logo) { logoEl.src = logo; logoEl.style.display='block'; } else { logoEl.style.display='none'; } }
-              const heroOverlay = document.getElementById('hero-overlay');
-              if (heroOverlay) { heroOverlay.style.background = logo ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.35)'; }
-            } catch {}
-        }
-        async function refreshGovernoratesSelect() {
-            const areaEl = document.getElementById('customer-area');
-            const areaWrapper = document.getElementById('customer-area-wrapper');
-            if (!areaEl) return;
-            if (!isGovsEnabled()) { if (areaWrapper) areaWrapper.style.display = 'none'; return; }
-            await loadGovernorates();
-            const current = areaEl.value;
-            const areaOptions = ['<option value="">اختر المحافظة</option>'].concat(
-                governorates.map(g => `<option value="${g.name}">${g.name}</option>`)
-            ).join('');
-            areaEl.innerHTML = areaOptions;
-            if (current) areaEl.value = current;
-            if (areaWrapper) areaWrapper.style.display = 'block';
-            updateGovernorateFeeDisplay(areaEl.value);
-        }
-        window.addEventListener('focus', applyLocalSettings);
-        document.addEventListener('visibilitychange', function(){ if (!document.hidden) { applyLocalSettings(); refreshGovernoratesSelect(); } });
-        window.addEventListener('focus', refreshGovernoratesSelect);
-        loadBranchConfigAndApply();
-        // فتح/إخفاء بحث داخل النافبار مباشرة
-        const toggleSearchBtn = document.getElementById('toggle-search-btn');
-        if (toggleSearchBtn) {
-            toggleSearchBtn.addEventListener('click', () => {
-                const overlay = document.getElementById('navbar-search-overlay');
-                const panel = document.getElementById('search-bar-panel');
-                if (!overlay) return;
-                const willOpen = overlay.classList.contains('hidden');
-                if (willOpen) {
-                    overlay.classList.remove('hidden');
-                    if (panel) panel.classList.add('hidden');
-                    const inputNavbar = document.getElementById('search-input-navbar');
-                    if (inputNavbar) setTimeout(() => inputNavbar.focus(), 100);
-                } else {
-                    overlay.classList.add('hidden');
-                }
-            });
-        }
-
-        // إغلاق عند الضغط خارج حقل الإدخال داخل النافبار
-        const navbarOverlay = document.getElementById('navbar-search-overlay');
-        if (navbarOverlay) {
-            navbarOverlay.addEventListener('click', (e) => {
-                // أغلق فقط عند الضغط على مساحة التراكب (خارج الحقل)
-                if (e.target === navbarOverlay) {
-                    navbarOverlay.classList.add('hidden');
-                }
-            });
-        }
-
-        // زر إغلاق “x”
-        const navbarCloseBtn = document.getElementById('navbar-search-close');
-        if (navbarCloseBtn) {
-            navbarCloseBtn.addEventListener('click', () => {
-                const overlay = document.getElementById('navbar-search-overlay');
-                if (overlay) overlay.classList.add('hidden');
-            });
-        }
-
-        // إغلاق عبر مفتاح Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const overlay = document.getElementById('navbar-search-overlay');
-                if (overlay && !overlay.classList.contains('hidden')) {
-                    overlay.classList.add('hidden');
-                }
-            }
         });
-
-        // دالة لتوليد كود الـ HTML لبطاقة الوجبة
-        const createItemCard = (item, sectionId) => {
-            const isList = viewMode === 'list';
-
-            // دعم عنصر "عنوان H2" داخل الفئة
-            if ((item.type || 'item') === 'heading') {
-                const headingHtml = `<h2 class="text-2xl font-bold text-main mb-2 border-b-2 border-[#ea580c]/50 pb-1">${item.name}</h2>`;
-                if (isList) {
-                    return `<div class="heading-item">${headingHtml}</div>`;
-                } else {
-                    // في الشبكة، اجعل العنوان بعرض العمودين ليكون عنصر تقسيم بصري
-                    return `<div class="heading-item col-span-2">${headingHtml}</div>`;
-                }
-            }
-
-            const cardClasses = isList
-                ? 'flex items-center gap-3 cursor-pointer'
-                : 'col-span-1 flex flex-col h-full cursor-pointer';
-            const imageClasses = isList
-                ? 'w-24 h-24 object-cover rounded-xl flex-shrink-0'
-                : 'w-full h-28 object-cover rounded-t-xl';
-            const contentClasses = isList
-                ? 'p-2 flex-1 flex flex-col justify-center'
-                : 'p-2 pt-3 flex flex-col justify-between h-auto';
-
-            const hasVariants = Array.isArray(item.variants) && item.variants.length > 0;
-            const basePrice = Number(item.price);
-            const hasPrice = Number.isFinite(basePrice) && basePrice > 0;
-            const priceText = hasVariants
-                ? ''
-                : (hasPrice ? `${basePrice.toLocaleString('ar-IQ')} د.ع` : '');
-            const priceHtml = priceText ? `<span class=\"text-sm font-black text-[#ea580c]\">${priceText}</span>` : '';
-
-            const variantsRow = hasVariants
-                ? `<div class=\"flex flex-col gap-2 mt-2\">\n                        ${item.variants.map(v => `\n                            <div class=\"flex items-center gap-1\">\n                                <span class=\"px-2 py-1 bg-[#ea580c] text-white rounded-lg text-xs font-bold\">${v.label}${Number(v.price) > 0 ? ` — ${Number(v.price).toLocaleString('ar-IQ')} د.ع` : ''}</span>\n                                <button class=\"add-to-cart-btn add-circle-btn self-center\"\n                                        onclick=\"addItemToCart(${item.id}, '${String(v.key)}', this); event.stopPropagation();\" title=\"أضف\">\n                                    <i data-lucide=\"plus\" class=\"w-4 h-4\"></i>\n                                </button>\n                            </div>\n                        `).join('')}\n                   </div>`
-                : '';
-
-            if (isList) {
-                // نمط القائمة: السعر بجانب الاسم، الوصف تحتهم، مع أزرار الأحجام إن وجدت
-                return `
-                <div class="menu-item bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-[#ea580c]/30 ${cardClasses}" data-id="${item.id}" data-name="${item.name}" data-desc="${item.desc}">
-                    <div class="relative flex-shrink-0">
-                        <img src="${item.img || ''}" alt="${item.name}" class="${imageClasses}" onerror="this.style.display='none'" style="${item.img ? '' : 'display:none;'}" onclick="openImageLightbox('${item.img || ''}'); event.stopPropagation();">
-                    </div>
-                    <div class="${contentClasses}">
-                        <div class="flex items-baseline justify-between gap-2 mb-1">
-                            <h4 class="text-base font-extrabold text-main">${item.name}</h4>
-                            ${priceHtml}
-                        </div>
-                        <p class="text-xs text-gray-600 mb-2">${item.desc || ''}</p>
-                        ${hasVariants ? variantsRow : `
-                            <button class="add-to-cart-btn self-start px-3 py-1 bg-[#ea580c] hover:bg-[#ea580c] text-white rounded-lg text-xs font-bold"
-                                    onclick="addItemToCart(${item.id}, null, this); event.stopPropagation();">
-                                أضف للسلة
-                            </button>
-                        `}
-                    </div>
-                </div>`;
-            }
-
-            // نمط الشبكة: إذا لا توجد أحجام وكان هناك صورة، نعرض زر + فوق الصورة.
-            // إذا لا توجد صورة، نخفي زر الـ overlay ونضع زر + داخل المحتوى تحت.
-            const hasImage = Boolean(item.img);
-            const overlayHtml = (!hasVariants && hasImage) ? `
-                <div class="add-button-overlay cursor-pointer" onclick="addItemToCart(${item.id}, null, this); event.stopPropagation();">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                </div>` : '';
-
-            return `
-                <div class="menu-item bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-[#ea580c]/30 ${cardClasses}" data-id="${item.id}" data-name="${item.name}" data-desc="${item.desc}">
-                    <div class="relative">
-                        <img src="${item.img || ''}" alt="${item.name}" class="${imageClasses}" onerror="this.style.display='none'" style="${item.img ? '' : 'display:none;'}" onclick="openImageLightbox('${item.img || ''}'); event.stopPropagation();">
-                        ${overlayHtml}
-                    </div>
-                    <div class="${contentClasses}">
-                        <div>
-                            <h4 class="text-base font-extrabold text-main mb-1">${item.name}</h4>
-                            <p class="text-xs text-gray-500 mb-1">${item.desc || ''}</p>
-                        </div>
-                        ${hasVariants ? variantsRow : (!hasImage ? `
-                            <button class="add-to-cart-btn add-circle-btn self-start"
-                                    onclick="addItemToCart(${item.id}, null, this); event.stopPropagation();">
-                                <i data-lucide="plus" class="w-4 h-4"></i>
-                            </button>
-                        ` : '')}
-                        <div class="mt-auto">
-                            ${priceHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
-        };
-
-        // جعل بطاقات العناصر قابلة للنقر لفتح معاينة المنتج
-         const wireItemCardClicks = () => {
-             const cards = document.querySelectorAll('.menu-item');
-             cards.forEach(card => {
-                 card.addEventListener('click', (e) => {
-                     // إذا تم النقر على زر الإضافة (+) أو زر "أضف للسلة"، لا نفتح المعاينة
-                     if (e.target.closest('.add-button-overlay') || e.target.closest('.add-to-cart-btn')) return;
-                     const idAttr = card.getAttribute('data-id');
-                     if (!idAttr) return;
-                     const id = Number(idAttr);
-                     openItemPreview(id);
-                 });
-             });
-         };
-
-         // فتح معاينة المنتج داخل المودال
-         const openItemPreview = (itemId) => {
-             const item = menuData.flatMap(section => section.items).find(i => i.id === itemId);
-             if (!item) return;
-             const overlay = document.getElementById('item-preview-overlay');
-             const modal = document.getElementById('item-preview-modal');
-             if (!overlay || !modal) return;
-             // تعبئة البيانات
-             const imgEl = document.getElementById('preview-img');
-             const nameEl = document.getElementById('preview-name');
-             const descEl = document.getElementById('preview-desc');
-             const priceEl = document.getElementById('preview-price');
-             const addBtn = document.getElementById('preview-add-btn');
-             const variantsContainer = document.getElementById('preview-variants');
-             const hasVariants = Array.isArray(item.variants) && item.variants.length > 0;
-
-             if (imgEl) { 
-                 const src = item.img || '';
-                 imgEl.style.display = src ? '' : 'none';
-                 imgEl.src = src; 
-                 imgEl.onclick = () => openImageLightbox(src); 
-             }
-             if (nameEl) nameEl.textContent = item.name;
-             if (descEl) descEl.textContent = item.desc || '';
-
-             // السعر: إخفاؤه عند عدم وجوده أو كونه 0
-             const basePrice = Number(item.price);
-             const hasPrice = Number.isFinite(basePrice) && basePrice > 0;
-             if (priceEl) priceEl.textContent = hasVariants
-                 ? ''
-                 : (hasPrice ? `${basePrice.toLocaleString('ar-IQ')} د.ع` : '');
-
-             // توليد أزرار الأحجام داخل المودال
-             if (variantsContainer) {
-                if (hasVariants) {
-                    variantsContainer.innerHTML = item.variants.map(v => (
-                         `<div class="flex items-center gap-1 mb-2">
-                            <span class="px-3 py-2 bg-[#ea580c] text-white rounded-lg text-xs font-bold">${v.label}${Number(v.price) > 0 ? ` — ${Number(v.price).toLocaleString('ar-IQ')} د.ع` : ''}</span>
-                            <button class="add-to-cart-btn add-circle-btn self-center"
-                                     onclick="addItemToCart(${item.id}, '${String(v.key)}', this); closeItemPreview();" title="أضف">
-                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                             </button>
-                         </div>`
-                     )).join('');
-                } else {
-                    variantsContainer.innerHTML = '';
-                }
-            }
-
-             // زر الإضافة العام: أخفِه عند وجود أحجام
-             if (addBtn) addBtn.style.display = hasVariants ? 'none' : 'inline-block';
-
-             // حفظ المعرف لاستخدامه عند الإضافة للسلة
-             modal.setAttribute('data-current-id', String(itemId));
-             // إنشاء الأيقونات الجديدة داخل محتوى المودال
-             lucide.createIcons();
-             // إظهار المودال
-             overlay.classList.remove('hidden');
-             modal.classList.remove('hidden');
-             document.body.style.overflow = 'hidden';
-         };
-
-         // إغلاق معاينة المنتج
-         const closeItemPreview = () => {
-             const overlay = document.getElementById('item-preview-overlay');
-             const modal = document.getElementById('item-preview-modal');
-             if (!overlay || !modal) return;
-             overlay.classList.add('hidden');
-             modal.classList.add('hidden');
-             document.body.style.overflow = 'auto';
-         };
-
-         // ربط أزرار الإغلاق والإضافة داخل المودال
-         (function initPreviewModalBindings() {
-             const overlay = document.getElementById('item-preview-overlay');
-             const closeBtn = document.getElementById('preview-close-btn');
-             const addBtn = document.getElementById('preview-add-btn');
-             if (overlay) overlay.addEventListener('click', closeItemPreview);
-             if (closeBtn) closeBtn.addEventListener('click', closeItemPreview);
-             if (addBtn) addBtn.addEventListener('click', () => {
-                const modal = document.getElementById('item-preview-modal');
-                if (!modal) return;
-                const idAttr = modal.getAttribute('data-current-id');
-                if (!idAttr) return;
-                const id = Number(idAttr);
-                addItemToCart(id);
-                closeItemPreview();
-            });
-         })();
-
-         // معاينة الصورة (ليبت بوكس)
-         const openImageLightbox = (src) => {
-             const overlay = document.getElementById('image-lightbox-overlay');
-             const modal = document.getElementById('image-lightbox-modal');
-             const img = document.getElementById('lightbox-img');
-             if (!overlay || !modal || !img) return;
-             // إعادة إظهار الصورة إن كانت مخفية بفعل onerror سابقاً
-             if (src) {
-               img.style.display = '';
-             } else {
-               img.style.display = 'none';
-             }
-             img.src = src || '';
-             overlay.classList.remove('hidden');
-             modal.classList.remove('hidden');
-         };
-         const closeImageLightbox = () => {
-             const overlay = document.getElementById('image-lightbox-overlay');
-             const modal = document.getElementById('image-lightbox-modal');
-             if (!overlay || !modal) return;
-             overlay.classList.add('hidden');
-             modal.classList.add('hidden');
-         };
-         (function initImageLightboxBindings() {
-             const overlay = document.getElementById('image-lightbox-overlay');
-             const closeBtn = document.getElementById('image-lightbox-close');
-             if (overlay) overlay.addEventListener('click', closeImageLightbox);
-             if (closeBtn) closeBtn.addEventListener('click', closeImageLightbox);
-         })();
-
-        // دالة لتوليد كود الـ HTML للقائمة بالكامل (عرض جميع الأقسام)
-        const renderMenu = (data) => {
-            const menuContent = document.getElementById('menu-content');
-            
-            if (data.length === 0) {
-                menuContent.innerHTML = `
-                    <div class="text-center text-gray-500 py-20">
-            <i data-lucide="restaurant" class="w-16 h-16 mx-auto mb-4 text-[#ea580c]"></i>
-                        <p class="text-3xl font-bold mb-2">القائمة فارغة حالياً</p>
-                        <p class="text-lg">يرجى إضافة أقسام وأطباق لعرضها.</p>
-                    </div>
-                `;
-            } else {
-                const containerCls = viewMode === 'list' ? 'space-y-3' : 'grid grid-cols-2 gap-4';
-                menuContent.innerHTML = data.map(section => `
-                    <section id="${section.id}" class="section-silver mb-12 pt-4">
-            <h3 class="text-4xl font-extrabold text-main mb-6 border-b-4 border-[#ea580c]/50 pb-3 inline-block">${section.title}</h3>
-                        <div class="${containerCls}">
-                            ${section.items.map(item => createItemCard(item, section.id)).join('')}
-                        </div>
-                    </section>
-                `).join('');
-            }
-
-            // بعد توليد المحتوى، قم بإنشاء الأيقونات وإعداد المراقب
-            lucide.createIcons();
-            wireItemCardClicks();
-        };
-
-        // دالة لتوليد العرض لقسم واحد فقط (بدون تمرير)
-        const renderMenuForSection = (sectionId) => {
-            const menuContent = document.getElementById('menu-content');
-            const section = menuData.find(s => s.id === sectionId);
-
-            if (!section) {
-                menuContent.innerHTML = `
-                    <div class="text-center text-gray-500 py-20">
-            <i data-lucide="alert-octagon" class="w-16 h-16 mx-auto mb-4 text-[#ea580c]"></i>
-                        <p class="text-2xl font-bold mb-2">القسم غير موجود</p>
-                        <p class="text-lg">يرجى اختيار قسم آخر.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            const containerCls = viewMode === 'list' ? 'space-y-3' : 'grid grid-cols-2 gap-4';
-            menuContent.innerHTML = `
-                <section id="${section.id}" class="section-silver mb-12 pt-4">
-            <h3 class="text-4xl font-extrabold text-main mb-6 border-b-4 border-[#ea580c]/50 pb-2 inline-block">${section.title}</h3>
-                    <div class="${containerCls}">
-                        ${(section.items || []).map(item => createItemCard(item, section.id)).join('')}
-                    </div>
-                </section>
-            `;
-
-            lucide.createIcons();
-            wireItemCardClicks();
-        };
-
-        // دالة لتوليد روابط الأقسام بصور أكبر والاسم أسفلها
-        const renderNav = (data) => {
-            const navList = document.getElementById('section-nav-list');
-            navList.innerHTML = data.map(section => {
-                const fallbackThumb = (section.items && section.items[0] && section.items[0].img) || '';
-                const thumb = (categoryImagesMap && categoryImagesMap[section.title]) || fallbackThumb;
-                return `
-                <li class="flex-shrink-0">
-                    <a href="#" class="nav-link category-card w-28 sm:w-32 md:w-36"
-                       onclick="renderMenuForSection('${section.id}'); document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active')); this.classList.add('active'); return false;"
-                       data-section-id="${section.id}" tabindex="0">
-                        <img src="${thumb || ''}" alt="${section.title}" onerror="this.style.display='none'" style="${thumb ? '' : 'display:none;'}">
-                        <div class="cat-overlay"></div>
-                        <span class="cat-title">${section.title}</span>
-                    </a>
-                </li>
-                `;
-            }).join('');
-            // تفعيل تأثيرات الظهور عند التمرير
-            initCategoryCardReveal();
-        };
-
-        // مراقب ظهور البطاقات عند التمرير لتحسين التجربة البصرية
-        const initCategoryCardReveal = () => {
-            const cards = document.querySelectorAll('#section-nav-list .category-card');
-            if (!cards.length) return;
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    if (e.isIntersecting) {
-                        e.target.classList.add('reveal');
-                        observer.unobserve(e.target);
-                    }
-                });
-            }, { threshold: 0.15 });
-            cards.forEach(c => observer.observe(c));
-        };
-
-        // أزرار تبديل نمط العرض: تفعيل وربط النقر
-        const updateViewToggleActive = () => {
-            const btnGrid = document.getElementById('btn-grid-view');
-            const btnList = document.getElementById('btn-list-view');
-            if (!btnGrid || !btnList) return;
-            const setActive = (btn, active) => {
-                btn.classList.toggle('bg-[#ea580c]', active);
-                btn.classList.toggle('text-white', active);
-                btn.classList.toggle('border-[#ea580c]', active);
-                btn.classList.toggle('bg-transparent', !active);
-                btn.classList.toggle('text-main', !active);
-                btn.classList.toggle('border-gray-300', !active);
-            };
-            setActive(btnGrid, viewMode === 'grid');
-            setActive(btnList, viewMode === 'list');
-        };
-
-        const initViewToggle = () => {
-            updateViewToggleActive();
-            const btnGrid = document.getElementById('btn-grid-view');
-            const btnList = document.getElementById('btn-list-view');
-            const rerender = () => {
-                localStorage.setItem('view_mode', viewMode);
-                updateViewToggleActive();
-                const activeLink = document.querySelector('.nav-link.active');
-                const activeId = activeLink ? activeLink.getAttribute('data-section-id') : null;
-                if (activeId) {
-                    renderMenuForSection(activeId);
-                } else {
-                    renderMenu(menuData);
-                }
-            };
-            if (btnGrid) btnGrid.addEventListener('click', () => { viewMode = 'grid'; rerender(); });
-            if (btnList) btnList.addEventListener('click', () => { viewMode = 'list'; rerender(); });
-        };
-        
-        // ------------------ خاصية البحث ------------------
-        const filterItems = () => {
-            // قراءة قيمة البحث إن وُجدت أي من الحقول
-            const desktopEl = document.getElementById('search-input');
-            const mobileEl = document.getElementById('search-input-mobile');
-            const navbarEl = document.getElementById('search-input-navbar');
-            const raw = ((desktopEl ? desktopEl.value : '') || (mobileEl ? mobileEl.value : '') || (navbarEl ? navbarEl.value : '')).toLowerCase().trim();
-            const query = raw;
-            const allItems = document.querySelectorAll('.menu-item');
-            let resultsFound = false;
-
-            allItems.forEach(item => {
-                const name = (item.getAttribute('data-name') || '').toLowerCase();
-                const desc = (item.getAttribute('data-desc') || '').toLowerCase();
-                if (query === '' || name.includes(query) || desc.includes(query)) {
-                    // استخدم display مناسب حسب نمط العرض
-                    item.style.display = viewMode === 'list' ? 'flex' : '';
-                    resultsFound = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // إظهار رسالة عدم وجود نتائج
-            const noRes = document.getElementById('no-results');
-            if (noRes) noRes.classList.toggle('hidden', resultsFound || query === '');
-
-            // إخفاء الأقسام التي لا تحتوي على نتائج مرئية
-            menuData.forEach(section => {
-                const sectionElement = document.getElementById(section.id);
-                if (sectionElement) {
-                    const visibleItems = Array.from(sectionElement.querySelectorAll('.menu-item')).filter(item => item.style.display !== 'none');
-                    sectionElement.style.display = (visibleItems.length > 0 || query === '') ? 'block' : 'none';
-                }
-            });
-        };
-        
-        // تم إلغاء تفعيل المراقب التلقائي لتفعيل الروابط عند التمرير
-        
-        // تم إزالة منطق الشريط الجانبي للقائمة لصالح شريط أفقي تحت البحث
-
-
-        // زر العودة للأعلى: إظهار/إخفاء وسلوك التمرير
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function handleScrollTopVisibility() {
-            const btn = document.getElementById('scroll-top-btn');
-            if (!btn) return;
-            const show = window.scrollY > 400;
-            btn.classList.toggle('hidden', !show);
-        }
-
-        window.addEventListener('scroll', handleScrollTopVisibility);
-
-        // تثبيت النافبار عند تجاوز ارتفاع الهيدر/الهيرو
-        function setupStickyNavbar() {
-            const navbar = document.getElementById('main-navbar');
-            const headerEl = document.querySelector('header');
-            const mainEl = document.querySelector('main');
-            if (!navbar || !headerEl || !mainEl) return;
-            const threshold = headerEl.offsetHeight - 8; // مسافة صغيرة للتشغيل السلس
-            const apply = () => {
-                const stuck = window.scrollY >= threshold;
-                navbar.classList.toggle('navbar-stuck', stuck);
-                navbar.classList.toggle('navbar-floating', !stuck);
-                // منع تغطية المحتوى عند التثبيت
-                if (stuck) {
-                    mainEl.style.paddingTop = navbar.offsetHeight + 'px';
-                } else {
-                    mainEl.style.paddingTop = '';
-                }
-            };
-            window.addEventListener('scroll', apply);
-            apply();
-        }
-
-        // ------------------ نقطة بدء التطبيق ------------------
-
-        async function applyHeroFromAssets() {
-            try {
-                const resp = await fetch('assets/hero.json', { cache: 'no-store' });
-                if (!resp.ok) return;
-                const data = await resp.json();
-                const imgEl = document.getElementById('hero-image');
-                const vidEl = document.getElementById('hero-video');
-                const titleEl = document.getElementById('hero-title');
-                const overlayEl = document.getElementById('hero-overlay');
-                const type = String(data.mediaType || '').toLowerCase();
-                const useVideo = type === 'video' && data.videoUrl;
-                if (useVideo && vidEl) {
-                    vidEl.src = data.videoUrl;
-                    vidEl.style.display = '';
-                    if (imgEl) imgEl.style.display = 'none';
-                } else {
-                    if (imgEl && data.imageUrl) { imgEl.src = data.imageUrl; imgEl.style.display = ''; }
-                    if (vidEl) { vidEl.removeAttribute('src'); vidEl.style.display = 'none'; }
-                }
-                if (titleEl && typeof data.title === 'string') titleEl.textContent = data.title;
-                if (overlayEl) {
-                    const op = Number(data.overlayOpacity);
-                    const opacity = Number.isFinite(op) ? Math.min(Math.max(op, 0), 1) : 0.35;
-                    overlayEl.style.backgroundColor = `rgba(0,0,0,${opacity})`;
-                }
-            } catch (e) {
-                // تجاهل أي أخطاء بتحميل الهيرو للحفاظ على القيم الافتراضية
-                console.warn('تعذّر تحميل hero.json', e);
-            }
-        }
-
-        window.onload = async () => {
-            // تطبيق الهيرو من ملف الأصول إن وجد
-            await applyHeroFromAssets();
-            // تحميل البيانات من التخزين المحلي أو الأصول ثم بناء الأقسام
-            const items = await loadMenuItemsFromAssetsOrStorage();
-            menuData = buildSections(items);
-
-            // سنجمع صور الفئات من الأصول هنا لدمجها لاحقاً مع المخزّن محلياً
-            let catImagesFromAssets = {};
-
-            // دمج فئات الأصول مع المخزّن المحلي، ودعم صيغة الكائنات {name, imageUrl}
-            try {
-                // قراءة الفئات من التخزين المحلي
-                let localCategoriesRaw = [];
-                const rawCatsList = localStorage.getItem('menu_categories');
-                if (rawCatsList) {
-                    try {
-                        const parsedCats = JSON.parse(rawCatsList);
-                        if (Array.isArray(parsedCats)) localCategoriesRaw = parsedCats;
-                    } catch {}
-                }
-
-                // قراءة الفئات من ملف الأصول دائماً للدمج
-                let assetsCatsRaw = [];
-                try {
-                    const respCats = await fetch('assets/categories.json', { cache: 'no-store' });
-                    if (respCats.ok) {
-                        const catsData = await respCats.json();
-                        if (Array.isArray(catsData)) assetsCatsRaw = catsData;
-                    }
-                } catch {}
-
-                // تجميع الأسماء ودمج الصور من الأصول عند توفرها
-                const categorySet = new Set();
-                const addCat = (cat) => {
-                    if (typeof cat === 'string') {
-                        const name = cat.trim();
-                        if (name) categorySet.add(name);
-                    } else if (cat && typeof cat === 'object') {
-                        const name = (cat.name || '').trim();
-                        if (name) {
-                            categorySet.add(name);
-                            if (cat.imageUrl) catImagesFromAssets[name] = cat.imageUrl;
-                        }
-                    }
-                };
-                localCategoriesRaw.forEach(addCat);
-                assetsCatsRaw.forEach(addCat);
-                const categoryNames = Array.from(categorySet);
-
-                if (categoryNames.length) {
-                    const existingTitles = new Set(menuData.map(s => s.title));
-                    categoryNames.forEach(name => {
-                        if (!existingTitles.has(name)) {
-                            menuData.push({ id: name.toLowerCase().replace(/\s+/g, '-'), title: name, items: [] });
-                        }
-                    });
-                    // تحديث المخزن المحلي ليعكس الدمج
-                    try { localStorage.setItem('menu_categories', JSON.stringify(categoryNames)); } catch {}
-                }
-            } catch {}
-
-            // تحميل صور الفئات من التخزين المحلي إن وجدت ثم دمج صور الأصول عند غيابها محلياً
-            try {
-                const rawCats = localStorage.getItem(CATS_IMAGES_KEY);
-                if (rawCats) {
-                    categoryImagesMap = JSON.parse(rawCats) || {};
-                }
-            } catch {}
-            // دمج صور الأصول دون الكتابة على الصور المحفوظة محلياً
-            try {
-                Object.entries(catImagesFromAssets).forEach(([name, url]) => {
-                    if (url && !categoryImagesMap[name]) categoryImagesMap[name] = url;
-                });
-            } catch {}
-
-            // 1. توليد روابط الأقسام بصور أكبر والاسم أسفلها
-            renderNav(menuData);
-            initViewToggle();
-            // تعيين الفئة الافتراضية “الفطور الصباحي” كنشطة إن وجدت
-            document.querySelectorAll('#section-nav-list .nav-link').forEach(l => l.classList.remove('active'));
-            const DEFAULT_SECTION_TITLE = 'الفطور الصباحي';
-            const defaultSection = menuData.find(s => s.title === DEFAULT_SECTION_TITLE);
-            if (defaultSection) {
-                const defLink = document.querySelector(`.nav-link[data-section-id="${defaultSection.id}"]`);
-                if (defLink) defLink.classList.add('active');
-            } else {
-                const firstNavLink = document.querySelector('#section-nav-list .nav-link');
-                if (firstNavLink) firstNavLink.classList.add('active');
-            }
-
-            // 2. تحميل السلة وتحديث العرض
-            loadCart();
-            updateCartDisplay();
-            // تفعيل أيقونات Lucide للعناصر الثابتة
-            if (window.lucide && typeof lucide.createIcons === 'function') {
-                lucide.createIcons();
-            }
-            // ضبط حالة ظهور زر العودة للأعلى عند بدء الصفحة
-            handleScrollTopVisibility();
-            // تحميل ملاحظة الزبون من التخزين المحلي وربط الحفظ الفوري
-            const noteEl = document.getElementById('customer-note');
-            if (noteEl) {
-                const savedNote = localStorage.getItem('restaurant_menu_cart_note');
-                if (savedNote) noteEl.value = savedNote;
-                noteEl.addEventListener('input', () => {
-                    localStorage.setItem('restaurant_menu_cart_note', noteEl.value);
-                });
-            }
-
-            // ربط حقول معلومات الزبون مع التخزين المحلي
-            const nameEl = document.getElementById('customer-name');
-            const phoneEl = document.getElementById('customer-phone');
-            const purchaseTypeEl = document.getElementById('purchase-type');
-            const orderTypeEl = document.getElementById('order-type');
-            const areaEl = document.getElementById('customer-area');
-            const addressEl = document.getElementById('delivery-address');
-            const addressWrapper = document.getElementById('delivery-address-wrapper');
-            const areaWrapper = document.getElementById('customer-area-wrapper');
-
-            // تحميل المحافظات وتوليدها في القائمة مع أجور الشحن
-            if (areaEl) {
-                const areaWrapper = document.getElementById('customer-area-wrapper');
-                if (!isGovsEnabled()) {
-                    if (areaWrapper) areaWrapper.style.display = 'none';
-                } else {
-                    await loadGovernorates();
-                    const areaOptions = ['<option value="">اختر المحافظة</option>'].concat(
-                        governorates.map(g => `<option value="${g.name}">${g.name}</option>`)
-                    ).join('');
-                    areaEl.innerHTML = areaOptions;
-                }
-            }
-
-            const savedInfoRaw = localStorage.getItem('restaurant_customer_info');
-            let savedInfo = {};
-            if (savedInfoRaw) {
-                try { savedInfo = JSON.parse(savedInfoRaw) || {}; } catch { savedInfo = {}; }
-            }
-            if (nameEl) nameEl.value = savedInfo.name || '';
-            if (phoneEl) phoneEl.value = savedInfo.phone || '';
-            if (purchaseTypeEl) purchaseTypeEl.value = savedInfo.purchaseType || 'نقد';
-            if (orderTypeEl) orderTypeEl.value = savedInfo.orderType || 'إرسال إلى العنوان';
-            if (areaEl) {
-                areaEl.value = savedInfo.area || '';
-                updateGovernorateFeeDisplay(areaEl.value);
-            }
-            if (addressEl) addressEl.value = savedInfo.address || '';
-
-            const persistInfo = () => {
-                const info = {
-                    name: nameEl ? nameEl.value : '',
-                    phone: phoneEl ? phoneEl.value : '',
-                    purchaseType: purchaseTypeEl ? purchaseTypeEl.value : 'نقد',
-                    orderType: orderTypeEl ? orderTypeEl.value : 'إرسال إلى العنوان',
-                    area: areaEl ? areaEl.value : '',
-                    address: addressEl ? addressEl.value : ''
-                };
-                localStorage.setItem('restaurant_customer_info', JSON.stringify(info));
-            };
-            if (nameEl) nameEl.addEventListener('input', persistInfo);
-            if (phoneEl) phoneEl.addEventListener('input', persistInfo);
-            if (purchaseTypeEl) purchaseTypeEl.addEventListener('change', persistInfo);
-            if (orderTypeEl) orderTypeEl.addEventListener('change', () => { persistInfo(); updateGovernorateFeeDisplay(areaEl ? areaEl.value : ''); updateCartDisplay(); });
-            if (areaEl) areaEl.addEventListener('change', () => { persistInfo(); updateGovernorateFeeDisplay(areaEl.value); updateCartDisplay(); });
-            if (addressEl) addressEl.addEventListener('input', persistInfo);
-
-            // إظهار العنوان دائمًا وتعطيل المحافظة
-            const toggleAddressVisibility = () => {
-                if (addressWrapper) addressWrapper.style.display = 'block';
-                if (areaWrapper) areaWrapper.style.display = isGovsEnabled() ? 'block' : 'none';
-            };
-            toggleAddressVisibility();
-            updateGovernorateFeeDisplay(areaEl ? areaEl.value : '');
-            
-            // 3. التأكد من عمل الأيقونات في الأماكن الثابتة
-            lucide.createIcons();
-            
-            // 4. عرض قسم افتراضي مباشرة بدون تمرير إن وجد
-            if (defaultSection) {
-                renderMenuForSection(defaultSection.id);
-            } else {
-                // عرض جميع الأقسام مباشرة عند فتح المنيو
-                renderMenu(menuData);
-            }
-
-            // تفعيل سلوك النافبار اللاصق
-            setupStickyNavbar();
-        };
-
-        // بناء نص الطلب لإرساله عبر واتساب (تنسيق الفاتورة)
-        function buildOrderMessage() {
-            const savedInfoRaw = localStorage.getItem('restaurant_customer_info');
-            let info = {};
-            try { info = JSON.parse(savedInfoRaw || '{}') || {}; } catch {}
-            const note = localStorage.getItem('restaurant_menu_cart_note') || '';
-
-            const name = info.name || '';
-            const phone = info.phone || '';
-            const purchaseType = info.purchaseType || 'نقد';
-            const orderType = info.orderType || 'إرسال إلى العنوان';
-            const area = info.area || '';
-            const address = info.address || '';
-
-            // قراءة اسم الفرع من الهيدر لعرضه أعلى الفاتورة
-            const headerBranchEl = document.getElementById('branch-name') || document.querySelector('header .text-xs.text-gray-600');
-            const branchNameRaw = headerBranchEl ? headerBranchEl.textContent.trim() : '';
-            const branchValue = branchNameRaw.replace(/^فرع\s*/, '').trim();
-
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let shippingFee = 0;
-            const isDelivery = (orderType || 'إرسال إلى العنوان') === 'إرسال إلى العنوان';
-            if (isDelivery && isGovsEnabled()) shippingFee = governoratesMap[area] || 0;
-            const finalTotal = subtotal + shippingFee;
-
-            // رقم الطلب المتغير يُستخدم داخليًا فقط (لا يُعرض في الرسالة)
-            const orderNumber = (() => {
-                const current = Number(localStorage.getItem('restaurant_order_number'));
-                if (Number.isFinite(current) && current > 0) {
-                    const next = current + 1;
-                    localStorage.setItem('restaurant_order_number', String(next));
-                    return next;
-                } else {
-                    const base = Number(new Date().getTime().toString().slice(-6));
-                    localStorage.setItem('restaurant_order_number', String(base));
-                    return base;
-                }
-            })();
-
-            // الأصناف: اسم الطبق مع الكمية والسعر (إجمالي السطر)
-            const itemsLines = cart.map(item => `- *${item.name}* x ${item.quantity} — *${(item.price * item.quantity).toLocaleString('ar-IQ')} د.ع*`).join('\n');
-
-            const lines = [
-                '*فاتورة الطلب*',
-                '',
-                '*الأصناف:*',
-                itemsLines || '—',
-                '',
-                `*المجموع:* *${finalTotal.toLocaleString('ar-IQ')} د.ع*`,
-                '',
-                `*الاسم:* *${name}*`,
-                `*الرقم:* *${phone}*`,
-                area ? `*المحافظة:* *${area}*` : '',
-                address ? `*العنوان:* *${address}*` : ''
-            ].filter(Boolean);
-
-            return lines.join('\n');
-        }
-
-        function sendOrderViaWhatsApp() {
-            // منع الإرسال إن كانت السلة فارغة
-            if (!Array.isArray(cart) || cart.length === 0) {
-                alert('السلة فارغة. يرجى إضافة صنف قبل الإرسال عبر واتساب.');
-                return;
-            }
-
-            // التحقق من الحقول الإجبارية
-            let info = {};
-            try {
-                info = JSON.parse(localStorage.getItem('restaurant_customer_info') || '{}') || {};
-            } catch {
-                info = {};
-            }
-            const missing = [];
-            const isDelivery = true;
-
-            if (!info.name) missing.push('الاسم');
-            if (!info.phone) missing.push('الرقم');
-
-            if (missing.length > 0) {
-                alert('الحقول الإجبارية ناقصة:\n- ' + missing.join('\n- '));
-                const idsMap = { 'الاسم': 'customer-name', 'الرقم': 'customer-phone' };
-                const firstId = idsMap[missing[0]];
-                const el = firstId ? document.getElementById(firstId) : null;
-                if (el && typeof el.focus === 'function') el.focus();
-                return;
-            }
-
-            const msg = buildOrderMessage();
-const rawWa = (window.BRANCH_CONFIG && window.BRANCH_CONFIG.whatsapp) || (localStorage.getItem('restaurant_whatsapp_number') || '9647734587101');
-            const normalizeWhatsAppNumber = (raw) => {
-                const digits = String(raw || '').replace(/\D/g, '');
-                if (!digits) return '';
-                if (digits.startsWith('964')) return digits.replace(/^9640/, '964');
-                if (digits.startsWith('0')) return '964' + digits.slice(1);
-                return digits;
-            };
-            const waNum = normalizeWhatsAppNumber(rawWa);
-            const url = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`;
-
-            // افتح واتساب فوراً بطريقة متوافقة مع المتصفحات
-            try {
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } catch (e) {
-                window.open(url, '_blank');
-            }
-
-            // بعد فتح واتساب، أرسل بيانات الزبون بشكل غير حاجز
-            try {
-                // استخرج معلومات إضافية اختيارية للسجل
-                const params = new URLSearchParams(window.location.search);
-                const branchKey = params.get('branch') || 'najaf';
-                const headerBranchEl = document.getElementById('branch-name');
-                const branchName = headerBranchEl ? headerBranchEl.textContent.trim() : '';
-                const orderNumber = Number(localStorage.getItem('restaurant_order_number'));
-
-                // احسب الإجمالي وعدد العناصر من السلة
-                const itemCount = Array.isArray(cart) ? cart.reduce((sum, it) => sum + (Number(it.quantity)||0), 0) : 0;
-                const subtotalPrice = Array.isArray(cart) ? cart.reduce((sum, it) => sum + ((Number(it.price)||0) * (Number(it.quantity)||0)), 0) : 0;
-
-                const payloadObj = {
-                    name: String(info.name || ''),
-                    phone: String(info.phone || ''),
-                    branch: branchKey,
-                    branchName: branchName,
-                    orderNumber: Number.isFinite(orderNumber) ? orderNumber : null,
-                    total: subtotalPrice,
-                    itemCount: itemCount,
-                    timestamp: new Date().toISOString()
-                };
-                const payload = JSON.stringify(payloadObj);
-                const blob = new Blob([payload], { type: 'application/json' });
-
-                // إذا تم ضبط رابط Google Apps Script، أرسل عبر مسارات متعددة لزيادة الاعتمادية
-                const hook = window.GS_WEBHOOK_URL || '';
-                let queued = false;
-                if (hook) {
-                    // 1) إرسال غير حاجز عبر sendBeacon
-                    queued = navigator.sendBeacon(hook, blob);
-
-                    // 2) إرسال إضافي عبر fetch بدون CORS (لا يقرأ الرد)
-                    try {
-                        fetch(hook, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            body: payload,
-                            mode: 'no-cors',
-                            keepalive: true
-                        }).catch(() => {});
-                    } catch {}
-
-                    // 3) إرسال عبر السيرفر المحلي ليحوّل الطلب إلى Google (يتجنب CORS تماماً)
-                    try {
-                        fetch('/api/forward-webhook', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ url: hook, data: payloadObj }),
-                            keepalive: true
-                        }).catch(() => {});
-                    } catch {}
-                }
-
-                // 4) النسخ الاحتياطي المحلي دائماً لضمان عدم فقدان السجل
-                fetch('/api/log-customer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: payload,
-                    keepalive: true
-                }).catch(() => {});
-            } catch (e) {
-                // لا نعرقل تجربة المستخدم بسبب أخطاء التسجيل
-                console.warn('فشل تسجيل بيانات الزبون بشكل غير حاجز', e);
-            }
-        }
-
-        function orderViaCall() {
-            // يمكن ضبط رقم المطعم لاحقاً عبر التخزين المحلي: restaurant_phone_number
-            const number = localStorage.getItem('restaurant_phone_number') || (window.BRANCH_CONFIG && window.BRANCH_CONFIG.phone) || '96407716664847';
-
-            // إرسال مخفي إلى Google Sheet قبل فتح الاتصال
-            try {
-                let info = {};
-                try { info = JSON.parse(localStorage.getItem('restaurant_customer_info') || '{}') || {}; } catch { info = {}; }
-                const params = new URLSearchParams(window.location.search);
-                const branchKey = params.get('branch') || 'najaf';
-                const headerBranchEl = document.getElementById('branch-name');
-                const branchName = headerBranchEl ? headerBranchEl.textContent.trim() : '';
-                const orderNumber = Number(localStorage.getItem('restaurant_order_number'));
-                const itemCount = Array.isArray(cart) ? cart.reduce((sum, it) => sum + (Number(it.quantity)||0), 0) : 0;
-                const subtotalPrice = Array.isArray(cart) ? cart.reduce((sum, it) => sum + ((Number(it.price)||0) * (Number(it.quantity)||0)), 0) : 0;
-                const payloadObj = {
-                    name: String(info.name || ''),
-                    phone: String(info.phone || ''),
-                    branch: branchKey,
-                    branchName: branchName,
-                    orderNumber: Number.isFinite(orderNumber) ? orderNumber : null,
-                    total: subtotalPrice,
-                    itemCount: itemCount,
-                    timestamp: new Date().toISOString(),
-                    method: 'call'
-                };
-                const payload = JSON.stringify(payloadObj);
-                const blob = new Blob([payload], { type: 'application/json' });
-                const hook = window.GS_WEBHOOK_URL || '';
-                if (hook) {
-                    navigator.sendBeacon(hook, blob);
-                    try { fetch(hook, { method: 'POST', body: payload, mode: 'no-cors', keepalive: true }).catch(() => {}); } catch {}
-                    try { fetch('/api/forward-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: hook, data: payloadObj }), keepalive: true }).catch(() => {}); } catch {}
-                }
-                fetch('/api/log-customer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }).catch(() => {});
-            } catch {}
-
-            // بعد ترتيب الإرسال غير الحاجز، افتح الاتصال
-            setTimeout(() => { window.location.href = `tel:${number}`; }, 60);
-        }
+    
+        // Event listener for the close ('X') button (disabled)
+        // closeModalButton.addEventListener('click', closeModal);
+    
+        // Event listener to close modal if user clicks on the background overlay (disabled)
+        // modal.addEventListener('click', (event) => {
+        //     if (event.target === modal) {
+        //         closeModal();
+        //     }
+        // });
+    
+        // Add listeners to close the modal after selecting an order type (disabled)
+        // orderTypeButtons.forEach(button => {
+        //     button.addEventListener('click', closeModal);
+        // });
+        const takeAwayBtn = document.getElementById('takeAwayBtn');
+        const dineInBtn = document.getElementById('dineInBtn');
+        // if (takeAwayBtn) {
+        //   takeAwayBtn.addEventListener('click', () => {
+        //     if (modalTitle.textContent.trim() === 'حي الحسين') {
+        //       window.location.href = "./splash.html";
+        //     }
+        //   });
+        // }
 
     </script>
-  <!-- سلوك شاشة البدء: إخفاء خلال ≤ 3 ثوانٍ مع إمكانية التخطي -->
-  <script>
-    (function() {
-      var splash = document.getElementById('splash-screen');
-      if (!splash) return;
-      var removed = false;
-      function hide() {
-        if (removed) return;
-        removed = true;
-        try {
-          splash.style.opacity = '0';
-          setTimeout(function() {
-            if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
-          }, 350);
-        } catch (e) {}
-      }
-      var MAX_DELAY = 3000; // الحد الأقصى للعرض
-      var MIN_DELAY_AFTER_LOAD = 1800; // تأخير قصير بعد اكتمال التحميل
-      window.addEventListener('load', function() { setTimeout(hide, MIN_DELAY_AFTER_LOAD); }, { once: true });
-      // ضمان عدم تجاوز 3 ثوانٍ
-      setTimeout(hide, MAX_DELAY);
-      // إمكانية التخطي بالنقر أو بلوحة المفاتيح
-      splash.addEventListener('click', hide, { once: true });
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' || e.key === 'Enter' || e.code === 'Space') hide();
-      });
-    })();
-  </script>
+    <script>
+      (function(){
+        const btn = document.getElementById('nav-search-btn');
+        const input = document.getElementById('nav-search-input');
+        if(!btn || !input) return;
 
-  <!-- ضبط الحشو السفلي ليعادل ارتفاع الفوتر تلقائيًا -->
-  <script>
-    (function() {
-      function adjustBottomPadding() {
-        var mainEl = document.querySelector('main');
-        var footerEl = document.getElementById('iqr-footer');
-        if (!mainEl || !footerEl) return;
-        var h = footerEl.offsetHeight || 0;
-        mainEl.style.paddingBottom = h + 'px';
-      }
-      window.addEventListener('load', adjustBottomPadding, { once: true });
-      window.addEventListener('resize', adjustBottomPadding);
-    })();
-  </script>
+        function toggleInput(){
+          input.classList.toggle('hidden');
+          if(!input.classList.contains('hidden')){
+            input.focus();
+            input.select();
+          }
+        }
 
-  <!-- فوتر ثابت: تم صنعها بواسطة İQR MENU (رابط أخضر) -->
-  <footer id="iqr-footer" class="fixed bottom-0 left-0 right-0 z-40 py-1 text-center text-xs text-gray-700 bg-white/95 backdrop-blur border-t border-gray-200">
-    <span>تم صنعها بواسطة | </span>
-    <a href="https://iqrarabic.com/" class="font-bold text-orange-600 hover:text-orange-700" target="_blank" rel="noopener">İQR MENU</a>
-  </footer>
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          if(input.classList.contains('hidden')){
+            toggleInput();
+          } else {
+            runFilter(input.value);
+          }
+        });
 
+        input.addEventListener('input', ()=> runFilter(input.value));
+        document.addEventListener('click', (e)=>{
+          const within = e.target.closest('nav');
+          if(!within && !input.classList.contains('hidden')){
+            input.classList.add('hidden');
+            runFilter('');
+          }
+        });
+
+        function runFilter(q){
+          const query = (q||'').trim();
+          const categories = document.querySelectorAll('.category-container');
+          const allItems = document.querySelectorAll('.category-items .flex, .category-items .grid > div');
+
+          if(!query){
+            categories.forEach(section => {
+              section.classList.remove('hidden');
+              const items = section.querySelector('.category-items');
+              const icon = section.querySelector('.chevron-icon');
+              items && items.classList.remove('open');
+              icon && icon.classList.remove('rotate-180');
+            });
+            allItems.forEach(r=> r.classList.remove('hidden'));
+            return;
+          }
+          const qn = query.toLowerCase();
+
+          let firstMatchRow = null;
+          let firstMatchItemsContainer = null;
+          let firstMatchOpenedNow = false;
+
+          categories.forEach(section => {
+            let visibleInSection = 0;
+            const rows = section.querySelectorAll('.category-items .flex, .category-items .grid > div');
+            rows.forEach(row => {
+              const nameEl = row.querySelector('h3, .font-bold');
+              const txt = (nameEl?.textContent || row.textContent || '').toLowerCase();
+              const match = txt.includes(qn);
+              row.classList.toggle('hidden', !match);
+              if(match){
+                visibleInSection++;
+                if(!firstMatchRow){
+                  firstMatchRow = row;
+                  firstMatchItemsContainer = section.querySelector('.category-items');
+                }
+              }
+            });
+
+            const items = section.querySelector('.category-items');
+            const icon = section.querySelector('.chevron-icon');
+
+            if(visibleInSection > 0){
+              section.classList.remove('hidden');
+              const wasOpen = items && items.classList.contains('open');
+              if(items){ items.classList.add('open'); }
+              if(icon){ icon.classList.add('rotate-180'); }
+              if(firstMatchRow && firstMatchItemsContainer === items && !wasOpen){
+                firstMatchOpenedNow = true;
+              }
+            } else {
+              section.classList.add('hidden');
+              if(items){ items.classList.remove('open'); }
+              if(icon){ icon.classList.remove('rotate-180'); }
+            }
+          });
+
+          if(firstMatchRow){
+            const scrollToRow = () => {
+              firstMatchRow.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+              firstMatchRow.classList.add('ring-2','ring-amber-500','rounded-md','bg-amber-50');
+              setTimeout(()=> {
+                firstMatchRow.classList.remove('ring-2','ring-amber-500','bg-amber-50');
+              }, 1200);
+            };
+
+            if(firstMatchOpenedNow && firstMatchItemsContainer){
+              const onOpened = (e) => {
+                if (e.propertyName === 'max-height'){
+                  firstMatchItemsContainer.removeEventListener('transitionend', onOpened);
+                  scrollToRow();
+                }
+              };
+              firstMatchItemsContainer.addEventListener('transitionend', onOpened);
+            } else {
+              scrollToRow();
+            }
+          }
+        }
+      })();
+    </script>
 </body>
 </html>
+

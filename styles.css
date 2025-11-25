@@ -1,0 +1,165 @@
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: #FEF9F8;
+}
+.image-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+.logo {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.category-items {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 1rem;
+}
+.category-items.open {
+    max-height: 75vh; /* limit height to viewport to enable scroll */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem;
+}
+.chevron-icon {
+    transition: transform 0.3s ease-in-out;
+}
+.chevron-icon.rotate-180 {
+    transform: rotate(180deg);
+}
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.category-container {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0; /* Start hidden */
+}
+/* Staggered animation delay */
+.category-container:nth-child(1) { animation-delay: 0.1s; }
+.category-container:nth-child(2) { animation-delay: 0.2s; }
+.category-container:nth-child(3) { animation-delay: 0.3s; }
+.category-container:nth-child(4) { animation-delay: 0.4s; }
+.category-container:nth-child(5) { animation-delay: 0.5s; }
+/* Modal styles */
+.modal-overlay {
+    transition: opacity 0.3s ease;
+}
+.modal-content {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+/* Mobile optimizations for order (cart) modal */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.5rem !important; /* reduce outer padding on small screens */
+  }
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh; /* keep it within viewport */
+    border-radius: 0.75rem; /* slightly smaller radius on phones */
+  }
+  /* Adjust header/body paddings inside modal */
+  .modal-content .p-4 { padding: 0.75rem !important; }
+  .modal-content .p-6 { padding: 1rem !important; }
+
+  /* Make the cart list scrollable area shorter on phones */
+  #cart-items-container {
+    max-height: 36vh;
+  }
+
+  /* Improve tap targets a bit */
+  #cart-button {
+    padding: 0.75rem !important;
+  }
+  #cart-count {
+    height: 20px;
+    width: 20px;
+    font-size: 12px;
+  }
+}
+/* Allow modal internal scrolling on all screens */
+.modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-content > .p-6 {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+}
+/* Cart shake animation for feedback */
+@keyframes cartShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-3px) rotate(-2deg); }
+  30% { transform: translateX(3px) rotate(2deg); }
+  45% { transform: translateX(-2px) rotate(-1.5deg); }
+  60% { transform: translateX(2px) rotate(1.5deg); }
+  75% { transform: translateX(-1px) rotate(-1deg); }
+  90% { transform: translateX(1px) rotate(1deg); }
+}
+.cart-shake {
+  animation: cartShake 420ms ease-in-out;
+  transform-origin: center;
+}
+/* Force light theme regardless of device dark mode */
+:root {
+  color-scheme: only light; /* ensure form controls and UA parts use light scheme */
+}
+html {
+  background-color: #FEF9F8;
+}
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: only light !important; }
+  html, body {
+    background-color: #FEF9F8 !important;
+    color: #1F2937 !important; /* Tailwind text-gray-800 equivalent */
+  }
+  /* Keep transparent elements transparent in dark mode too */
+  .bg-transparent { background-color: transparent !important; }
+  /* Force cards and sections to stay light */
+  .bg-white { background-color: #FFFFFF !important; }
+  .text-gray-800 { color: #1F2937 !important; }
+  .text-white { color: #FFFFFF !important; }
+}
+
+/* --- Size tweaks: enlarge sections a bit --- */
+/* Increase header image height across sections */
+.category-header img {
+  height: 10rem !important; /* ~160px on phones */
+}
+@media (min-width: 640px) {
+  .category-header img { height: 12rem !important; /* ~192px on larger screens */ }
+}
+/* Add a bit more spacing between sections */
+.category-container {
+  margin-bottom: 1.25rem; /* 20px */
+}
+/* Slightly more inner padding when open */
+.category-items.open {
+  padding: 1.25rem; /* was 1rem */
+}
+/* Ensure add-to-cart buttons render as perfect circles with centered + icon across all pages */
+.add-to-cart-btn {
+  width: 1.75rem; /* Tailwind w-7 */
+  height: 1.75rem; /* Tailwind h-7 */
+  border-radius: 9999px; /* rounded-full */
+  display: inline-flex;
+  align-items: center; /* items-center */
+  justify-content: center; /* justify-center */
+  flex-shrink: 0;
+  line-height: 0; /* avoid text baseline affecting vertical centering */
+}
+.add-to-cart-btn svg {
+  width: 1.25rem; /* Tailwind w-5 */
+  height: 1.25rem; /* Tailwind h-5 */
+  pointer-events: none;
+}

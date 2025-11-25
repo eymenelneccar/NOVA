@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova — Splash</title>
+  <style>
+    :root {
+      --bg1: #fff7ed; /* warm light */
+      --bg2: #ffedd5; /* peach */
+      --brand: #c2410c; /* amber-700 like */
+      --shadow: 0 10px 25px rgba(0,0,0,0.12), 0 6px 10px rgba(0,0,0,0.08);
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      background: radial-gradient(100% 100% at 50% 0%, var(--bg1) 0%, var(--bg2) 100%);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .splash {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .logo {
+      width: min(42vw, 160px);
+      height: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+      will-change: transform, opacity;
+      animation: bounceTwice 1.2s ease-out both;
+      border-radius: 16px;
+    }
+
+    @keyframes bounceTwice {
+      0%   { transform: translateY(0) scale(1); }
+      15%  { transform: translateY(-24px) scale(1.02); }
+      30%  { transform: translateY(0) scale(1); }
+      45%  { transform: translateY(-14px) scale(1.01); }
+      60%  { transform: translateY(0) scale(1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .flip-out {
+      animation: flipOut 0.8s ease-in forwards;
+    }
+    @keyframes flipOut {
+      0%   { transform: perspective(600px) rotateX(0deg) translateY(0) scale(1); opacity: 1; }
+      60%  { transform: perspective(600px) rotateX(60deg) translateY(-40px) scale(0.98); opacity: 0.6; }
+      100% { transform: perspective(600px) rotateX(90deg) translateY(-120px) scale(0.95); opacity: 0; }
+    }
+
+    /* Fallback in case animations are disabled */
+    @media (prefers-reduced-motion: reduce) {
+      .logo { animation: none; }
+      .flip-out { animation: none; opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash" aria-label="شاشة البداية">
+    <img id="logo" class="logo" src="veiw/logo.png" alt="Nova Logo" />
+  </div>
+
+  <script>
+    (function() {
+      // وضع الصيانة: إذا كان مُفعلاً في بقية الصفحات، نعرض رسالة صيانة هنا أيضاً
+      if (window.NOVA_MAINTENANCE === true) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;padding:24px';
+        overlay.innerHTML = '<div style="background:#fff;color:#111;padding:24px;border-radius:16px;text-align:center;max-width:520px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.15)" dir="rtl"><div style="font-weight:800;font-size:20px;margin-bottom:8px">نقوم حالياً بأعمال صيانة</div><div style="font-size:14px;color:#374151;margin-bottom:16px">سنعود للعمل خلال وقت قصير. نشكرك على صبرك وتفهمك.</div><a href="tel:07736427608" style="display:inline-block;background:#10b981;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700">الاتصال بنا</a></div>';
+        document.body.appendChild(overlay);
+        document.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); }, true);
+        document.addEventListener('submit', (e)=>{ e.preventDefault(); e.stopPropagation(); }, true);
+        return;
+      }
+
+      const logo = document.getElementById('logo');
+      if (!logo) return;
+
+      // بعد انتهاء القفزتين، نفعل حركة القلب والاختفاء
+      logo.addEventListener('animationend', function onEnd(e) {
+        if (e.animationName === 'bounceTwice') {
+          logo.classList.add('flip-out');
+        } else if (e.animationName === 'flipOut') {
+          // الانتقال مباشرة بعد 2 ثانية إجمالي (1.2s + 0.8s)
+          window.location.href = 'hy-alhusin-sfry.html';
+        }
+      });
+
+      // حماية: في حال لم تُطلّق events لأي سبب، نضمن الخروج بعد ~2s
+      setTimeout(function() {
+        try { window.location.href = 'hy-alhusin-sfry.html'; } catch (_) {}
+      }, 2100);
+    })();
+  </script>
+</body>
+</html>
+

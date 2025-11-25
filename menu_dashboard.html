@@ -59,8 +59,8 @@
     .tile-grid { display:flex; flex-wrap:wrap; gap:.75rem; }
     .phone { width:270px; max-width:100%; border-radius:36px; background:#0B0B0B; box-shadow: 0 20px 40px rgba(0,0,0,.25); padding:10px; }
     .phone-screen { border-radius:24px; background:#fff; overflow:hidden; }
-    .phone-screen .iframe-wrap { width:100%; height:520px; overflow:hidden; background:#fff; position:relative; left:8px; top:2px; }
-    .phone-screen .iframe-wrap iframe { display:block; width:125%; height:125%; border:0; background:#fff; transform: scale(0.80); transform-origin: top center; border-radius:24px; }
+    .phone-screen .iframe-wrap { width:100%; height:520px; overflow:hidden; background:#fff; position:relative; border-radius:24px; }
+    .phone-screen .iframe-wrap iframe { display:block; width:100%; height:100%; border:0; background:#fff; border-radius:inherit; }
     .footer-links { font-size:.8rem; color:#4B5563; }
     .footer-links a { color:#2563EB; }
     .support-btn { position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:9999px; background:#22C55E; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-md); }
@@ -70,6 +70,10 @@
     .tile-action:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .tile-action .sub { display:block; font-size:.85rem; color:#6B7280; font-weight:600; margin-top:.25rem; }
     .tile-action svg { width:20px; height:20px; margin-left:.5rem; color: var(--color-primary); }
+    .tile-action.disabled { background:#E5E7EB; border:1px solid #D1D5DB; color:#9CA3AF; cursor:not-allowed; box-shadow:none; }
+    .tile-action.disabled:hover { transform:none; box-shadow:none; }
+    .tile-action.disabled .sub { color:#9CA3AF; }
+    .tile-action.disabled svg { color:#9CA3AF; }
     .section-focus { box-shadow: 0 0 0 3px var(--ring); border-radius: var(--radius-lg); }
   </style>
 </head>
@@ -115,11 +119,11 @@
   </header>
   <section class="px-4 sm:px-8 mb-8">
     <div class="tiles-xl">
-      <a id="tileHero" class="tile-action" href="hero.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8" cy="8" r="2" stroke-width="2"/><path d="M21 15l-4-4-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الــهيرو<span class="sub">تحرير الصورة والنص</span></a>
+      <a id="tileHero" class="tile-action disabled" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8" cy="8" r="2" stroke-width="2"/><path d="M21 15l-4-4-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الــهيرو<span class="sub">تحرير الصورة والنص</span></a>
       <a id="tileCats" class="tile-action" href="categories.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="8" height="8" rx="1" stroke-width="2"/><rect x="13" y="3" width="8" height="8" rx="1" stroke-width="2"/><rect x="3" y="13" width="8" height="8" rx="1" stroke-width="2"/><rect x="13" y="13" width="8" height="8" rx="1" stroke-width="2"/></svg>إدارة الفئات<span class="sub">الصور والترتيب</span></a>
       <a id="tileItems" class="tile-action" href="items.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="4" cy="6" r="1" stroke-width="2"/><circle cx="4" cy="12" r="1" stroke-width="2"/><circle cx="4" cy="18" r="1" stroke-width="2"/><path d="M8 6h12" stroke-width="2" stroke-linecap="round"/><path d="M8 12h12" stroke-width="2" stroke-linecap="round"/><path d="M8 18h12" stroke-width="2" stroke-linecap="round"/></svg>إدارة الأصناف<span class="sub">إضافة وتعديل وحذف</span></a>
-      <a id="tileGovs" class="tile-action" href="governorates.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s-6-5.5-6-10a6 6 0 1 1 12 0c0 4.5-6 10-6 10z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="11" r="3" stroke-width="2"/></svg>إدارة المحافظات<span class="sub">أجور التوصيل</span></a>
-      <a id="tileSettings" class="tile-action lg:col-span-2" href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-width="2"/><path d="M19.4 15a7.8 7.8 0 0 0 .1-2l2-1.5-2-3.5-2.3.5a7.8 7.8 0 0 0-1.7-1l-.5-2.3h-4l-.5 2.3a7.8 7.8 0 0 0-1.7 1L4.5 8l-2 3.5L4.4 13a7.8 7.8 0 0 0 .1 2l-2 1.5 2 3.5 2.3-.5a7.8 7.8 0 0 0 1.7 1l.5 2.3h4l.5-2.3a7.8 7.8 0 0 0 1.7-1l2.3.5 2-3.5-2-1.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الإعدادات<span class="sub">خيارات عامة للواجهة</span></a>
+      <a id="tileGovs" class="tile-action disabled" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s-6-5.5-6-10a6 6 0 1 1 12 0c0 4.5-6 10-6 10z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="11" r="3" stroke-width="2"/></svg>إدارة المحافظات<span class="sub">أجور التوصيل</span></a>
+      <a id="tileSettings" class="tile-action disabled lg:col-span-2" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-width="2"/><path d="M19.4 15a7.8 7.8 0 0 0 .1-2l2-1.5-2-3.5-2.3.5a7.8 7.8 0 0 0-1.7-1l-.5-2.3h-4l-.5 2.3a7.8 7.8 0 0 0-1.7 1L4.5 8l-2 3.5L4.4 13a7.8 7.8 0 0 0 .1 2l-2 1.5 2 3.5 2.3-.5a7.8 7.8 0 0 0 1.7 1l.5 2.3h4l.5-2.3a7.8 7.8 0 0 0 1.7-1l2.3.5 2-3.5-2-1.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الإعدادات<span class="sub">خيارات عامة للواجهة</span></a>
     </div>
   </section>
 
