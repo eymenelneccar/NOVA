@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة المحافظات | iqr menu BACKOFFICE</title>
+  <style>
+    :root { --color-primary:#5A3920; --ring:#2563EB; --radius-lg:16px; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 14px rgba(0,0,0,.12); }
+    body { font-family: system-ui, -apple-system, Segoe UI, Tahoma, Arial; background:#FAF7F4; color:#111827; margin:0; }
+    .navbar { background:#fff; border-bottom:1px solid #E5E7EB; }
+    .brand { font-weight:800; text-transform:lowercase; }
+    .brand-sub { font-weight:700; margin-right:.5rem; color:#9CA3AF; }
+    .card { background:#fff; border:1px solid #E5DED4; border-radius:16px; padding:1rem; box-shadow: var(--shadow-sm); }
+    .input { border:1px solid #D1D5DB; border-radius:12px; padding:.5rem .75rem; }
+    .btn { border-radius:12px; padding:.5rem .75rem; font-weight:700; }
+    .btn-primary { background: var(--color-primary); color:#fff; border:0; }
+    .btn-outline { background:#fff; border:1px solid #D1D5DB; }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem 1rem 2rem; }
+    ul { list-style:none; padding:0; margin:0; }
+    .back-link { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .75rem; background:#EFE6DD; border:1px solid #E5DED4; color:#1F2937; border-radius:9999px; text-decoration:none; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .back-link:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); background:#E8DFD6; }
+    .back-link svg { width:18px; height:18px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar w-full py-2 px-4 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="brand text-lg sm:text-xl">iqr menu</span>
+      <span class="brand-sub">BACKOFFICE</span>
+    </div>
+    <a href="menu_dashboard.html" class="back-link" aria-label="الرجوع إلى اللوحة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>الرجوع إلى اللوحة</span>
+    </a>
+  </nav>
+
+  <main class="container">
+    <h1 class="text-2xl font-extrabold mb-3">إدارة المحافظات</h1>
+    <div class="card">
+      <div class="p-6 space-y-4" style="padding:0">
+        <div class="grid" style="display:grid; grid-template-columns: 2fr 1fr auto; gap:.5rem;">
+          <input id="newGovName" type="text" class="input" placeholder="اسم المحافظة" />
+          <input id="newGovFee" type="number" min="0" step="1" class="input" placeholder="الأجور" />
+          <button id="btnAddGov" class="btn btn-primary">إضافة</button>
+        </div>
+        <ul id="govsList" class="space-y-2" style="display:block; margin-top:1rem"></ul>
+        <div style="display:flex; gap:.5rem; align-items:center; margin-top:.5rem;">
+          <label style="display:flex; gap:.4rem; align-items:center;">
+            <input id="govsEnabledToggle" type="checkbox" />
+            <span>تفعيل المحافظات</span>
+          </label>
+          <button id="btnSaveGovs" class="btn btn-outline">حفظ</button>
+          <span id="govsSaveStatus" class="text-xs text-gray-500"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const GOVS_KEY = 'menu_governorates';
+    const SAVE_GOVS_ENDPOINT = '/api/save-governorates';
+
+    let governorates = [];
+
+    const els = {
+      govsList: document.getElementById('govsList'),
+      newGovName: document.getElementById('newGovName'),
+      newGovFee: document.getElementById('newGovFee'),
+      btnAddGov: document.getElementById('btnAddGov'),
+      btnSaveGovs: document.getElementById('btnSaveGovs'),
+      govsSaveStatus: document.getElementById('govsSaveStatus'),
+      govsEnabledToggle: document.getElementById('govsEnabledToggle'),
+    };
+
+    function sanitizeGovEntry(g) {
+      if (!g) return null;
+      if (typeof g === 'string') return { name: g.trim(), fee: 0 };
+      const name = (g.name || '').trim();
+      const fee = Number(g.fee) || 0;
+      if (!name) return null;
+      return { name, fee };
+    }
+
+    async function loadGovernoratesFromAssets() {
+      try { const resp = await fetch('assets/governorates.json', { cache:'no-store' }); if (resp.ok) { const data = await resp.json(); if (Array.isArray(data)) return data.map(sanitizeGovEntry).filter(Boolean); } } catch {}
+      return [];
+    }
+
+    function loadGovernorates() { try { const raw = localStorage.getItem(GOVS_KEY); if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr)) return arr.map(sanitizeGovEntry).filter(Boolean); } } catch {} return []; }
+    function saveGovernorates() { localStorage.setItem(GOVS_KEY, JSON.stringify(governorates)); }
+    function isGovsEnabled() { return localStorage.getItem('menu_governorates_enabled') === '1'; }
+    function setGovsEnabled(v) { localStorage.setItem('menu_governorates_enabled', v ? '1' : '0'); }
+
+    async function saveGovernoratesToServer() {
+      try {
+        if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'جارِ الحفظ...';
+        const payload = Array.isArray(governorates) ? governorates.map(sanitizeGovEntry).filter(Boolean) : [];
+        const resp = await fetch(SAVE_GOVS_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const json = await resp.json().catch(()=>({}));
+        if (!resp.ok || !json.ok) throw new Error(json.error||'فشل الحفظ');
+        if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'تم الحفظ ✓';
+      } catch {
+        if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'فشل الحفظ';
+      } finally {
+        setTimeout(()=>{ if (els.govsSaveStatus) els.govsSaveStatus.textContent = ''; }, 1200);
+      }
+    }
+
+    function renderGovsList() {
+      if (!Array.isArray(governorates)) governorates = [];
+      els.govsList.innerHTML = governorates.map((g,i)=>`
+        <li class="flex items-center justify-between border rounded-lg px-2 py-2 sm:px-3" style="display:flex; align-items:center; justify-content:space-between; border:1px solid #E5DED4; border-radius:12px; padding:.5rem .75rem; margin:.25rem 0;">
+          <div class="flex items-center gap-3" style="display:flex; gap:.75rem; align-items:center;">
+            <span class="text-gray-800 text-sm sm:text-base">${g.name}</span>
+            <span class="text-gray-600 text-xs sm:text-sm">الأجور: ${Number(g.fee)||0} دينار</span>
+          </div>
+          <div class="flex items-center gap-2" style="display:flex; gap:.5rem;">
+            <button type="button" class="btn btn-outline" data-action="rename" data-index="${i}">إعادة تسمية</button>
+            <button type="button" class="btn btn-outline" data-action="editFee" data-index="${i}">تعديل الأجور</button>
+            <button type="button" class="btn btn-primary" style="background:#dc2626" data-action="delete" data-index="${i}">حذف</button>
+          </div>
+        </li>`).join('');
+    }
+
+    els.btnAddGov.addEventListener('click', ()=>{ const name=(els.newGovName.value||'').trim(); const fee=Number(els.newGovFee.value); if (!name) return; const idx = governorates.findIndex(g=> (g.name||'')===name); if (idx===-1) governorates.push({ name, fee: Number.isFinite(fee)?fee:0 }); else governorates[idx]={ name, fee: Number.isFinite(fee)?fee:0 }; saveGovernorates(); renderGovsList(); saveGovernoratesToServer(); els.newGovName.value=''; els.newGovFee.value=''; });
+
+    els.govsList.addEventListener('click',(e)=>{ const btn=e.target.closest('button'); if (!btn) return; const action=btn.getAttribute('data-action'); const index=Number(btn.getAttribute('data-index')); if (!Number.isInteger(index)) return; const g=governorates[index]; if (!g) return;
+      if (action==='rename') { const newName = prompt('الاسم الجديد للمحافظة:', g.name); if (!newName) return; const finalName = newName.trim(); if (!finalName) return; const dup = governorates.find((x,i)=> i!==index && (x.name||'')===finalName); if (dup) { alert('اسم المحافظة موجود بالفعل.'); return; } governorates[index] = { ...g, name: finalName }; saveGovernorates(); renderGovsList(); saveGovernoratesToServer(); }
+      else if (action==='editFee') { const input = prompt('أدخل الأجور (دينار):', String(g.fee||0)); if (input==null) return; const fee=Number(input); governorates[index] = { ...g, fee: Number.isFinite(fee)?fee:0 }; saveGovernorates(); renderGovsList(); saveGovernoratesToServer(); }
+      else if (action==='delete') { if (!confirm(`سيتم حذف المحافظة "${g.name}".`)) return; governorates.splice(index,1); saveGovernorates(); renderGovsList(); saveGovernoratesToServer(); }
+    });
+
+    if (els.btnSaveGovs) {
+      els.btnSaveGovs.addEventListener('click', async ()=>{
+        const original = els.govsSaveStatus ? els.govsSaveStatus.textContent : '';
+        if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'جارِ الحفظ...';
+        try {
+          const payload = Array.isArray(governorates) ? governorates.map(sanitizeGovEntry).filter(Boolean) : [];
+          const resp = await fetch(SAVE_GOVS_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          const json = await resp.json().catch(()=>({}));
+          if (!resp.ok || !json.ok) throw new Error(json.error||'فشل الحفظ');
+          if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'تم الحفظ ✓';
+        } catch {
+          if (els.govsSaveStatus) els.govsSaveStatus.textContent = 'فشل الحفظ';
+        } finally {
+          setTimeout(()=>{ if (els.govsSaveStatus) els.govsSaveStatus.textContent = original || ''; }, 1500);
+        }
+      });
+    }
+
+    if (els.govsEnabledToggle) {
+      els.govsEnabledToggle.addEventListener('change', ()=>{ setGovsEnabled(!!els.govsEnabledToggle.checked); });
+    }
+
+    (async ()=>{
+      const fromAssets = await loadGovernoratesFromAssets();
+      if (Array.isArray(fromAssets) && fromAssets.length) {
+        governorates = fromAssets;
+        saveGovernorates();
+      } else {
+        governorates = loadGovernorates();
+      }
+      if (els.govsEnabledToggle) els.govsEnabledToggle.checked = isGovsEnabled();
+      renderGovsList();
+    })();
+  </script>
+</body>
+</html>

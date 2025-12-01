@@ -1,0 +1,42 @@
+[
+  {
+    "name": "قهوة ساخنة",
+    "imageUrl": "assets/images/1000261908.jpg"
+  },
+  {
+    "name": "قهوة باردة",
+    "imageUrl": "assets/images/1000281586.jpg"
+  },
+  {
+    "name": "قهوة تركية",
+    "imageUrl": "assets/images/turkk.jpg"
+  },
+  {
+    "name": "شاي مثلج",
+    "imageUrl": "assets/images/1000281623.jpg"
+  },
+  {
+    "name": "فريز",
+    "imageUrl": "assets/images/1000281588.jpg"
+  },
+  {
+    "name": "الفطائر",
+    "imageUrl": "assets/images/fataer.jpg"
+  },
+  {
+    "name": "ساندويش",
+    "imageUrl": "assets/images/1000281670.jpg"
+  },
+  {
+    "name": "المخبوزات",
+    "imageUrl": "assets/images/1000259427.jpg"
+  },
+  {
+    "name": "عصائر طبيعية",
+    "imageUrl": "assets/images/1000281584.jpg"
+  },
+  {
+    "name": "سوبر شيك",
+    "imageUrl": "assets/images/1000281621.jpg"
+  }
+]

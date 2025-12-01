@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>الــهيرو | iqr menu BACKOFFICE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --color-primary:#5A3920; --ring:#2563EB; --radius-lg:16px; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 14px rgba(0,0,0,.12); }
+    body { font-family: Cairo, system-ui, -apple-system, Segoe UI, Tahoma, Arial; background:#FAF7F4; color:#111827; margin:0; }
+    .navbar { background:#fff; border-bottom:1px solid #E5E7EB; }
+    .brand { font-weight:800; text-transform:lowercase; }
+    .brand-sub { font-weight:700; margin-right:.5rem; color:#9CA3AF; }
+    .card { background:#fff; border:1px solid #E5DED4; border-radius:16px; padding:1rem; box-shadow: var(--shadow-sm); }
+    .input { border:1px solid #D1D5DB; border-radius:12px; padding:.5rem .75rem; }
+    .btn { border-radius:12px; padding:.5rem .75rem; font-weight:700; }
+    .btn-primary { background: var(--color-primary); color:#fff; border:0; }
+    .btn-outline { background:#fff; border:1px solid #D1D5DB; }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem 1rem 2rem; }
+    .text-primary { color: var(--color-primary); }
+    .back-link { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .75rem; background:#EFE6DD; border:1px solid #E5DED4; color:#1F2937; border-radius:9999px; text-decoration:none; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .back-link:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); background:#E8DFD6; }
+    .back-link svg { width:18px; height:18px; }
+    .seg { display:inline-flex; border:1px solid #D1D5DB; border-radius:9999px; overflow:hidden; }
+    .seg button { padding:.35rem .9rem; background:#fff; border:0; font-weight:700; color:#374151; }
+    .seg button.active { background: var(--color-primary); color:#fff; }
+    .preview-media { width:100%; height:240px; object-fit:cover; border-radius:12px; border:1px solid #D1D5DB; }
+  </style>
+</head>
+<body>
+  <nav class="navbar w-full py-2 px-4 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="brand text-lg sm:text-xl">iqr menu</span>
+      <span class="brand-sub">BACKOFFICE</span>
+    </div>
+    <a href="menu_dashboard.html" class="back-link" aria-label="الرجوع إلى اللوحة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>الرجوع إلى اللوحة</span>
+    </a>
+  </nav>
+
+  <main class="container">
+    <h1 class="text-2xl font-extrabold mb-3">الــهيرو</h1>
+    <div id="heroEditCard" class="card">
+      <div class="flex items-center justify-between" style="display:flex; align-items:center; justify-content:space-between;">
+        <h3 class="text-lg font-bold text-primary">تحرير الصورة أو الفيديو والنص</h3>
+        <div class="seg" id="mediaSeg">
+          <button type="button" data-type="image" class="active">صورة</button>
+          <button type="button" data-type="video">فيديو</button>
+        </div>
+      </div>
+      <div class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+        <div>
+          <img id="heroPreviewImg" class="preview-media" src="" alt="معاينة الصورة" onerror="this.style.display='none'" />
+          <video id="heroPreviewVideo" class="preview-media" style="display:none" playsinline loop muted controls></video>
+          <div style="margin-top:.5rem">
+            <span style="font-size:.9rem; color:#6B7280">النص الظاهر فوق الوسائط:</span>
+            <div id="heroPreviewTitle" class="mt-1 font-bold text-primary" style="font-size:1.1rem">—</div>
+          </div>
+        </div>
+        <form id="heroForm" class="space-y-3">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">نص الهيرو</label>
+            <input id="heroTitle" type="text" class="input w-full" placeholder="مثال: مرحبًا بكم" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">رابط الصورة</label>
+            <input id="heroImage" type="text" inputmode="url" class="input w-full" placeholder="https://... أو assets/images/…" />
+            <div class="flex items-center gap-2" style="display:flex; align-items:center; gap:.5rem; margin-top:.5rem;">
+              <button type="button" id="btnUploadHeroImage" class="btn btn-outline">رفع صورة</button>
+              <span id="heroUploadStatus" class="text-xs text-gray-500"></span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">رابط الفيديو</label>
+            <input id="heroVideo" type="text" inputmode="url" class="input w-full" placeholder="https://... أو assets/videos/…" />
+            <div class="flex items-center gap-2" style="display:flex; align-items:center; gap:.5rem; margin-top:.5rem;">
+              <button type="button" id="btnUploadHeroVideo" class="btn btn-outline">رفع فيديو</button>
+              <span id="heroVideoStatus" class="text-xs text-gray-500"></span>
+            </div>
+          </div>
+          <div class="flex justify-end gap-2" style="display:flex; justify-content:flex-end; gap:.5rem;">
+            <button type="button" id="btnSaveHero" class="btn btn-primary">حفظ الهيرو</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SAVE_HERO_ENDPOINT = '/api/save-hero';
+    const UPLOAD_ENDPOINT = '/api/upload-image';
+
+    const els = {
+      heroForm: document.getElementById('heroForm'),
+      heroTitle: document.getElementById('heroTitle'),
+      heroImage: document.getElementById('heroImage'),
+      btnUploadHeroImage: document.getElementById('btnUploadHeroImage'),
+      heroUploadStatus: document.getElementById('heroUploadStatus'),
+      btnSaveHero: document.getElementById('btnSaveHero'),
+      heroPreviewImg: document.getElementById('heroPreviewImg'),
+      heroPreviewVideo: document.getElementById('heroPreviewVideo'),
+      heroPreviewTitle: document.getElementById('heroPreviewTitle'),
+      heroImageFileInput: (() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.style.display='none'; input.tabIndex=-1; document.body.appendChild(input); return input; })(),
+      heroVideoFileInput: (() => { const input = document.createElement('input'); input.type = 'file'; input.accept = 'video/*'; input.style.display='none'; input.tabIndex=-1; document.body.appendChild(input); return input; })(),
+      mediaSeg: document.getElementById('mediaSeg'),
+      heroVideo: document.getElementById('heroVideo'),
+      btnUploadHeroVideo: document.getElementById('btnUploadHeroVideo'),
+      heroVideoStatus: document.getElementById('heroVideoStatus'),
+    };
+
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
+    }
+
+    function updateHeroPreview() {
+      const imgUrl = (els.heroImage && els.heroImage.value) || '';
+      const vidUrl = (els.heroVideo && els.heroVideo.value) || '';
+      const type = getMediaType();
+      if (type === 'video' && vidUrl) {
+        if (els.heroPreviewVideo) { els.heroPreviewVideo.style.display='block'; els.heroPreviewVideo.src = vidUrl; }
+        if (els.heroPreviewImg) { els.heroPreviewImg.style.display='none'; }
+      } else {
+        if (els.heroPreviewImg) { els.heroPreviewImg.style.display='block'; els.heroPreviewImg.src = imgUrl; }
+        if (els.heroPreviewVideo) { els.heroPreviewVideo.style.display='none'; els.heroPreviewVideo.removeAttribute('src'); }
+      }
+      if (els.heroPreviewTitle) els.heroPreviewTitle.textContent = (els.heroTitle && els.heroTitle.value) || '';
+    }
+
+    async function loadHeroFromAssets() {
+      try {
+        const resp = await fetch('assets/hero.json', { cache: 'no-store' });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (els.heroTitle) els.heroTitle.value = (data.title || '');
+        const fallbackHero = 'assets/images/17a7a6365dcde068822d456917306995.jpg';
+        if (els.heroImage) els.heroImage.value = (data.imageUrl || fallbackHero);
+        if (els.heroVideo) els.heroVideo.value = (data.videoUrl || '');
+        updateHeroPreview();
+      } catch {}
+    }
+
+    async function uploadHeroImage(file) {
+      if (!file) return;
+      const original = els.heroUploadStatus ? els.heroUploadStatus.textContent : '';
+      if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, data: dataUrl }) });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        if (els.heroImage) els.heroImage.value = json.path;
+        updateHeroPreview();
+        if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'تم الرفع ✓';
+      } catch {
+        if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => { if (els.heroUploadStatus) els.heroUploadStatus.textContent = original || ''; }, 1500);
+        if (els.heroImageFileInput) els.heroImageFileInput.value = '';
+      }
+    }
+
+    async function uploadHeroVideo(file) {
+      if (!file) return;
+      const original = els.heroVideoStatus ? els.heroVideoStatus.textContent : '';
+      if (els.heroVideoStatus) els.heroVideoStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, data: dataUrl }) });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        if (els.heroVideo) els.heroVideo.value = json.path;
+        updateHeroPreview();
+        if (els.heroVideoStatus) els.heroVideoStatus.textContent = 'تم الرفع ✓';
+      } catch {
+        if (els.heroVideoStatus) els.heroVideoStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => { if (els.heroVideoStatus) els.heroVideoStatus.textContent = original || ''; }, 1500);
+        if (els.heroVideoFileInput) els.heroVideoFileInput.value = '';
+      }
+    }
+
+    async function saveHeroToServer() {
+      const payload = { title: (els.heroTitle && els.heroTitle.value) || '', imageUrl: (els.heroImage && els.heroImage.value) || '', videoUrl: (els.heroVideo && els.heroVideo.value) || '', mediaType: getMediaType() };
+      const originalText = els.btnSaveHero ? els.btnSaveHero.textContent : '';
+      if (els.btnSaveHero) { els.btnSaveHero.textContent = 'جارِ الحفظ...'; els.btnSaveHero.disabled = true; }
+      try {
+        const resp = await fetch(SAVE_HERO_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok) throw new Error(json.error || 'تعذّر حفظ الهيرو');
+        if (els.btnSaveHero) els.btnSaveHero.textContent = 'تم الحفظ ✓';
+      } catch {
+        if (els.btnSaveHero) els.btnSaveHero.textContent = 'فشل الحفظ';
+      } finally {
+        setTimeout(() => { if (els.btnSaveHero) { els.btnSaveHero.textContent = originalText || 'حفظ الهيرو'; els.btnSaveHero.disabled = false; } }, 1500);
+      }
+    }
+
+    function getMediaType() {
+      const active = els.mediaSeg && els.mediaSeg.querySelector('button.active');
+      const vid = (els.heroVideo && els.heroVideo.value) || '';
+      const img = (els.heroImage && els.heroImage.value) || '';
+      if (active) return active.getAttribute('data-type') || (vid ? 'video' : 'image');
+      return vid ? 'video' : 'image';
+    }
+
+    if (els.heroTitle) els.heroTitle.addEventListener('input', updateHeroPreview);
+    if (els.heroImage) els.heroImage.addEventListener('input', updateHeroPreview);
+    if (els.heroVideo) els.heroVideo.addEventListener('input', updateHeroPreview);
+    if (els.btnUploadHeroImage) els.btnUploadHeroImage.addEventListener('click', () => { if (els.heroImageFileInput) els.heroImageFileInput.click(); });
+    if (els.heroImageFileInput) els.heroImageFileInput.addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; uploadHeroImage(f); });
+    if (els.btnUploadHeroVideo) els.btnUploadHeroVideo.addEventListener('click', () => { if (els.heroVideoFileInput) els.heroVideoFileInput.click(); });
+    if (els.heroVideoFileInput) els.heroVideoFileInput.addEventListener('change', (e) => { const f = e.target.files && e.target.files[0]; uploadHeroVideo(f); });
+    if (els.btnSaveHero) els.btnSaveHero.addEventListener('click', saveHeroToServer);
+
+    if (els.mediaSeg) {
+      els.mediaSeg.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-type]');
+        if (!btn) return;
+        Array.from(els.mediaSeg.querySelectorAll('button')).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateHeroPreview();
+      });
+    }
+
+    loadHeroFromAssets();
+  </script>
+</body>
+</html>

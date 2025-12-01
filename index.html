@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشروع مزاج</title>
+    <!-- Include Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Arabic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the page */
+        body {
+            font-family: 'Cairo', sans-serif;
+            /* Using colors similar to the provided image */
+            background-color: #FDFBF8;
+        }
+
+        /* This pseudo-element creates the decorative diamond shape at the top of the menu */
+        .decorative-column::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 80px;
+            height: 80px;
+            background-color: #FDFBF8;
+            border: 4px solid #EAE6E1;
+            z-index: 1;
+        }
+
+        /* This pseudo-element creates the inner color of the diamond shape */
+        .decorative-column::after {
+            content: '';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 56px;
+            height: 56px;
+            background-color: #F3F0EC;
+            z-index: 2;
+        }
+        
+        /* Hide decorative diamond shapes around the logo */
+        .decorative-column::before,
+        .decorative-column::after { content: none !important; display: none !important; }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Fixed Transparent Navbar -->
+    <nav class="fixed inset-x-0 top-0 z-50 bg-transparent backdrop-blur-sm">
+        <div class="max-w-5xl mx-auto px-2 h-10 flex items-center justify-between gap-2">
+            <div class="text-[0.75rem] font-extrabold tracking-widest text-stone-800">NOVΛ CAFE | مَشرُوع مَزاج</div>
+            <input id="nav-search-input" type="search" class="hidden bg-white/90 text-gray-900 rounded-md px-3 py-1 text-sm shadow focus:outline-none focus:ring-2 focus:ring-amber-500 min-w-0 w-44" />
+            <button id="nav-search-btn" aria-label="بحث" class="p-1 rounded-full hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-stone-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto max-w-lg min-h-[calc(100vh-40px)] relative flex flex-col items-center justify-center px-4">
+        
+        
+
+        <!-- Main Content: The Menu -->
+        <main class="px-4">
+            <!-- Central Decorative Column -->
+            <div class="decorative-column relative bg-[#F3F0EC] border-x-4 border-[#EAE6E1] rounded-lg mx-auto">
+                
+                <!-- Logo at the top of the column -->
+                <div class="absolute -top-14 left-1/2 -translate-x-1/2 w-32 h-32 bg-white rounded-full flex items-center justify-center border-2 border-gray-200 shadow-sm z-10 p-1">
+                    <!-- ملاحظة: هذا المسار يعمل فقط إذا كان الملف موجوداً على جهاز الكمبيوتر المحلي -->
+                    <img src="veiw/logo.png" alt="شعار" class="w-[85%] h-[85%] object-contain rounded-full">
+                </div>
+
+                <!-- Menu Selection -->
+                <div class="pt-24 p-6 flex flex-col items-center min-h-[300px] justify-center">
+
+                    <div class="w-full max-w-xs space-y-4">
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            حي الحسين
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            جامعة الزهراء
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            جامعة الوارث
+                        </button>
+                        <button class="location-button w-full bg-stone-800 text-white py-3 rounded-lg text-lg font-bold shadow-lg hover:bg-stone-700 transition-all duration-300 transform hover:scale-105">
+                            مبيعات الجملة
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <!-- Footer Section -->
+        <footer class="text-center py-4">
+            <p class="text-sm text-stone-500">© 2025 جميع الحقوق محفوظة NOVΛ CAFE</p>
+        </footer>
+
+    </div>
+
+    <!-- Modal (disabled) -->
+    <div id="orderTypeModal" class="hidden">
+    </div>
+
+    <script>
+        const locationButtons = document.querySelectorAll('.location-button');
+        const modal = document.getElementById('orderTypeModal');
+        const modalBox = document.getElementById('modalBox');
+        const modalTitle = document.getElementById('modal-title');
+        const closeModalButton = document.getElementById('closeModal');
+        const orderTypeButtons = modal.querySelectorAll('.space-y-3 button');
+    
+        const openModal = (title) => {
+            modalTitle.textContent = title;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // A small delay to ensure transition is applied correctly
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalBox.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        };
+    
+        const closeModal = () => {
+            modal.classList.add('opacity-0');
+            modalBox.classList.add('scale-95', 'opacity-0');
+            // Wait for transition to finish before hiding
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300); // Must match transition duration
+        };
+    
+        locationButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const branch = button.textContent.trim();
+                if (branch === 'حي الحسين') {
+                    window.location.href = './hy-alhusin-sfry.html';
+                } else if (branch === 'جامعة الزهراء') {
+                    window.location.href = './hy-elz-sfry.html';
+                } else if (branch === 'جامعة الوارث') {
+                    window.location.href = './hy-wars-sfry.html';
+                } else if (branch === 'مبيعات الجملة') {
+                    const phone = '96407736427608';
+                    const message = 'مرحبا NOVA, أحتاج أسعار الجملة.';
+                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                    window.location.href = url;
+                } else {
+                    window.location.href = './hy-alhusin-sfry.html';
+                }
+            });
+        });
+    
+        // Event listener for the close ('X') button (disabled)
+        // closeModalButton.addEventListener('click', closeModal);
+    
+        // Event listener to close modal if user clicks on the background overlay (disabled)
+        // modal.addEventListener('click', (event) => {
+        //     if (event.target === modal) {
+        //         closeModal();
+        //     }
+        // });
+    
+        // Add listeners to close the modal after selecting an order type (disabled)
+        // orderTypeButtons.forEach(button => {
+        //     button.addEventListener('click', closeModal);
+        // });
+        const takeAwayBtn = document.getElementById('takeAwayBtn');
+        const dineInBtn = document.getElementById('dineInBtn');
+        // if (takeAwayBtn) {
+        //   takeAwayBtn.addEventListener('click', () => {
+        //     if (modalTitle.textContent.trim() === 'حي الحسين') {
+        //       window.location.href = "./splash.html";
+        //     }
+        //   });
+        // }
+
+    </script>
+    <script>
+      (function(){
+        const btn = document.getElementById('nav-search-btn');
+        const input = document.getElementById('nav-search-input');
+        if(!btn || !input) return;
+
+        function toggleInput(){
+          input.classList.toggle('hidden');
+          if(!input.classList.contains('hidden')){
+            input.focus();
+            input.select();
+          }
+        }
+
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          if(input.classList.contains('hidden')){
+            toggleInput();
+          } else {
+            runFilter(input.value);
+          }
+        });
+
+        input.addEventListener('input', ()=> runFilter(input.value));
+        document.addEventListener('click', (e)=>{
+          const within = e.target.closest('nav');
+          if(!within && !input.classList.contains('hidden')){
+            input.classList.add('hidden');
+            runFilter('');
+          }
+        });
+
+        function runFilter(q){
+          const query = (q||'').trim();
+          const categories = document.querySelectorAll('.category-container');
+          const allItems = document.querySelectorAll('.category-items .flex, .category-items .grid > div');
+
+          if(!query){
+            categories.forEach(section => {
+              section.classList.remove('hidden');
+              const items = section.querySelector('.category-items');
+              const icon = section.querySelector('.chevron-icon');
+              items && items.classList.remove('open');
+              icon && icon.classList.remove('rotate-180');
+            });
+            allItems.forEach(r=> r.classList.remove('hidden'));
+            return;
+          }
+          const qn = query.toLowerCase();
+
+          let firstMatchRow = null;
+          let firstMatchItemsContainer = null;
+          let firstMatchOpenedNow = false;
+
+          categories.forEach(section => {
+            let visibleInSection = 0;
+            const rows = section.querySelectorAll('.category-items .flex, .category-items .grid > div');
+            rows.forEach(row => {
+              const nameEl = row.querySelector('h3, .font-bold');
+              const txt = (nameEl?.textContent || row.textContent || '').toLowerCase();
+              const match = txt.includes(qn);
+              row.classList.toggle('hidden', !match);
+              if(match){
+                visibleInSection++;
+                if(!firstMatchRow){
+                  firstMatchRow = row;
+                  firstMatchItemsContainer = section.querySelector('.category-items');
+                }
+              }
+            });
+
+            const items = section.querySelector('.category-items');
+            const icon = section.querySelector('.chevron-icon');
+
+            if(visibleInSection > 0){
+              section.classList.remove('hidden');
+              const wasOpen = items && items.classList.contains('open');
+              if(items){ items.classList.add('open'); }
+              if(icon){ icon.classList.add('rotate-180'); }
+              if(firstMatchRow && firstMatchItemsContainer === items && !wasOpen){
+                firstMatchOpenedNow = true;
+              }
+            } else {
+              section.classList.add('hidden');
+              if(items){ items.classList.remove('open'); }
+              if(icon){ icon.classList.remove('rotate-180'); }
+            }
+          });
+
+          if(firstMatchRow){
+            const scrollToRow = () => {
+              firstMatchRow.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+              firstMatchRow.classList.add('ring-2','ring-amber-500','rounded-md','bg-amber-50');
+              setTimeout(()=> {
+                firstMatchRow.classList.remove('ring-2','ring-amber-500','bg-amber-50');
+              }, 1200);
+            };
+
+            if(firstMatchOpenedNow && firstMatchItemsContainer){
+              const onOpened = (e) => {
+                if (e.propertyName === 'max-height'){
+                  firstMatchItemsContainer.removeEventListener('transitionend', onOpened);
+                  scrollToRow();
+                }
+              };
+              firstMatchItemsContainer.addEventListener('transitionend', onOpened);
+            } else {
+              scrollToRow();
+            }
+          }
+        }
+      })();
+    </script>
+</body>
+</html>
+

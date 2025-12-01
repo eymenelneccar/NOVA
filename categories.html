@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة الفئات | iqr menu BACKOFFICE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --color-primary:#5A3920; --ring:#2563EB; --radius-lg:16px; --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 14px rgba(0,0,0,.12); }
+    body { font-family: Cairo, system-ui, -apple-system, Segoe UI, Tahoma, Arial; background:#FAF7F4; color:#111827; margin:0; }
+    .navbar { background:#fff; border-bottom:1px solid #E5E7EB; }
+    .brand { font-weight:800; text-transform:lowercase; }
+    .brand-sub { font-weight:700; margin-right:.5rem; color:#9CA3AF; }
+    .card { background:#fff; border:1px solid #E5DED4; border-radius:16px; padding:1rem; box-shadow: var(--shadow-sm); }
+    .input { border:1px solid #D1D5DB; border-radius:12px; padding:.5rem .75rem; }
+    .btn { border-radius:12px; padding:.5rem .75rem; font-weight:700; }
+    .btn-primary { background: var(--color-primary); color:#fff; border:0; }
+    .btn-outline { background:#fff; border:1px solid #D1D5DB; }
+    .container { width:100%; max-width:100%; margin:0 auto; padding:.75rem .75rem 1.5rem; }
+    @media (min-width:640px){ .container { max-width:800px; } }
+    .text-primary { color: var(--color-primary); }
+    ul { list-style:none; padding:0; margin:0; }
+    .back-link { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .75rem; background:#EFE6DD; border:1px solid #E5DED4; color:#1F2937; border-radius:9999px; text-decoration:none; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .back-link:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); background:#E8DFD6; }
+    .back-link svg { width:18px; height:18px; }
+    .toolbar { display:flex; flex-direction:column; gap:.6rem; align-items:stretch; }
+    @media (min-width:640px){ .toolbar { display:grid; grid-template-columns: 1fr auto 1fr auto; align-items:center; } }
+    .toolbar .input { height:42px; }
+    .pill { display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .8rem; border-radius:9999px; border:1px solid #E5DED4; background:#FFF; }
+    .cat-item { display:flex; align-items:center; justify-content:space-between; border:1px solid #E5DED4; border-radius:12px; padding:.5rem .75rem; margin:.25rem 0; }
+    .cat-left { display:flex; align-items:center; gap:.75rem; }
+    .cat-thumb { width:48px; height:48px; border-radius:8px; border:1px solid #D1D5DB; object-fit:cover; }
+    .actions { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:flex-end; }
+    .btn-icon { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.45rem .7rem; border-radius:10px; border:1px solid #D1D5DB; background:#fff; min-width:40px; min-height:40px; }
+    .btn-icon svg { width:18px; height:18px; }
+    .btn-danger { background:#dc2626; color:#fff; border-color:#dc2626; }
+  </style>
+</head>
+<body>
+  <nav class="navbar w-full py-2 px-4 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="brand text-lg sm:text-xl">iqr menu</span>
+      <span class="brand-sub">BACKOFFICE</span>
+    </div>
+    <a href="menu_dashboard.html" class="back-link" aria-label="الرجوع إلى اللوحة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>الرجوع إلى اللوحة</span>
+    </a>
+  </nav>
+
+  <main class="container">
+    <h1 class="text-2xl font-extrabold mb-3">إدارة الفئات</h1>
+    <div class="card">
+      <div class="space-y-3">
+        <div class="toolbar">
+          <input id="newCatName" type="text" class="input" placeholder="اسم فئة جديدة" />
+          <button id="btnAddCat" class="btn btn-primary">إضافة</button>
+          <input id="catSearch" type="text" class="input" placeholder="بحث عن فئة" />
+          <button id="btnSaveCats" class="btn btn-outline">حفظ</button>
+        </div>
+        <div class="pill" id="catsMeta"></div>
+        <ul id="catsList" class="space-y-2"></ul>
+        <span id="catsUploadStatus" class="text-xs text-gray-500"></span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'menu_assets';
+    const CATS_KEY = 'menu_categories';
+    const CATS_IMAGES_KEY = 'menu_category_images';
+    const FALLBACK_CATEGORY = 'أخرى';
+    const UPLOAD_ENDPOINT = '/api/upload-image';
+    const SAVE_CATS_ENDPOINT = '/api/save-categories';
+
+    let categories = [];
+    let categoryImages = {};
+    let pendingCatImageName = null;
+    let catQuery = '';
+
+    const els = {
+      catsList: document.getElementById('catsList'),
+      newCatName: document.getElementById('newCatName'),
+      btnAddCat: document.getElementById('btnAddCat'),
+      btnSaveCats: document.getElementById('btnSaveCats'),
+      catsUploadStatus: document.getElementById('catsUploadStatus'),
+      catSearch: document.getElementById('catSearch'),
+      catsMeta: document.getElementById('catsMeta'),
+      catImageFileInput: (() => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.style.display='none'; input.tabIndex=-1; document.body.appendChild(input); return input; })(),
+    };
+
+    function fileToDataURL(file) { return new Promise((resolve,reject)=>{ const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file); }); }
+
+    function saveCategories() { localStorage.setItem(CATS_KEY, JSON.stringify(categories)); }
+    function loadCategories() { try { const raw=localStorage.getItem(CATS_KEY); if (raw) { const arr=JSON.parse(raw); if (Array.isArray(arr)) return arr; } } catch {} return []; }
+    function saveCategoryImages() { localStorage.setItem(CATS_IMAGES_KEY, JSON.stringify(categoryImages || {})); }
+    function loadCategoryImages() { try { const raw=localStorage.getItem(CATS_IMAGES_KEY); if (raw) { const obj=JSON.parse(raw); if (obj && typeof obj==='object') return obj; } } catch {} return {}; }
+
+    async function loadCategoriesFromAssets() {
+      try { const resp = await fetch('assets/categories.json', { cache:'no-store' }); if (resp.ok) { const data=await resp.json(); if (Array.isArray(data)) return data; } } catch {}
+      return [];
+    }
+
+    function deriveCategoriesFromItems(itemsArr) {
+      const set = new Set(itemsArr.map(i => (i.category||'').trim()).filter(Boolean));
+      if (!set.size) { ['القهوة','الشاي','العصائر'].forEach(c => set.add(c)); }
+      return Array.from(set);
+    }
+
+    async function loadItemsForDerive() {
+      try { const raw=localStorage.getItem(STORAGE_KEY); if (raw) { const arr=JSON.parse(raw); if (Array.isArray(arr)) return arr; } } catch {}
+      try { const resp=await fetch('assets/menu.json',{cache:'no-store'}); if (resp.ok) { const data=await resp.json(); if (Array.isArray(data)) return data; } } catch {}
+      return [];
+    }
+
+    function renderCatsList() {
+      if (!Array.isArray(categories)) categories = [];
+      const filtered = catQuery ? categories.filter(c => c.toLowerCase().includes(catQuery.toLowerCase())) : categories.slice();
+      if (els.catsMeta) els.catsMeta.textContent = `عدد الفئات: ${filtered.length}`;
+      els.catsList.innerHTML = filtered.map((c,i)=>{ const realIdx = categories.indexOf(c); const isFirst = realIdx===0; const isLast = realIdx===categories.length-1; return `
+        <li class="cat-item">
+          <div class="cat-left">
+            <img src="${(categoryImages && categoryImages[c]) || ''}" alt="صورة ${c}" class="cat-thumb" onerror="this.style.display='none'" style="${(categoryImages && categoryImages[c]) ? '' : 'display:none;'}" />
+            <span class="text-gray-800 text-sm sm:text-base">${c}</span>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn-icon ${isFirst?'opacity-50':''}" ${isFirst?'disabled':''} data-action="moveUp" data-index="${realIdx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5M5 12l7-7 7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button type="button" class="btn-icon ${isLast?'opacity-50':''}" ${isLast?'disabled':''} data-action="moveDown" data-index="${realIdx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M19 12l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button type="button" class="btn-icon" data-action="uploadImg" data-name="${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h16M12 4v12M7 9l5-5 5 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>رفع</span></button>
+            ${(categoryImages && categoryImages[c]) ? `<button type="button" class="btn-icon" data-action="removeImg" data-name="${c}"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\"><path d=\"M19 7l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7m3-3h8m-5 4v8m4-8v8\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span>حذف الصورة</span></button>` : ''}
+            <button type="button" class="btn-icon" data-action="rename" data-name="${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>إعادة تسمية</span></button>
+            <button type="button" class="btn-icon btn-danger" data-action="delete" data-name="${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 7l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7m3-3h8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>حذف</span></button>
+          </div>
+        </li>`}).join('');
+    }
+
+    els.btnAddCat.addEventListener('click', ()=>{ const name=(els.newCatName.value||'').trim(); if (!name) return; if (!categories.includes(name)) { categories.push(name); saveCategories(); renderCatsList(); } els.newCatName.value=''; });
+    els.catsList.addEventListener('click',(e)=>{ const btn = e.target.closest('button'); if (!btn) return; const action = btn.getAttribute('data-action'); const oldName = btn.getAttribute('data-name');
+      if (action==='uploadImg') { pendingCatImageName = oldName; els.catImageFileInput.click(); return; }
+      if (action==='removeImg') { if (categoryImages && categoryImages[oldName]) { delete categoryImages[oldName]; saveCategoryImages(); renderCatsList(); } return; }
+      if (action==='rename') { const newName = prompt('الاسم الجديد للفئة:', oldName); if (!newName) return; const finalName = newName.trim(); if (!finalName || finalName===oldName) return; if (categories.includes(finalName)) { alert('اسم الفئة موجود بالفعل.'); return; } const idx = categories.indexOf(oldName); if (idx>-1) { categories[idx]=finalName; if (categoryImages && categoryImages[oldName]) { categoryImages[finalName]=categoryImages[oldName]; delete categoryImages[oldName]; saveCategoryImages(); } saveCategories(); renderCatsList(); } return; }
+      if (action==='moveUp' || action==='moveDown') { const idx = Number(btn.getAttribute('data-index')); if (!Number.isInteger(idx)) return; if (action==='moveUp' && idx>0) { const tmp = categories[idx-1]; categories[idx-1] = categories[idx]; categories[idx] = tmp; } else if (action==='moveDown' && idx<categories.length-1) { const tmp = categories[idx+1]; categories[idx+1] = categories[idx]; categories[idx] = tmp; } saveCategories(); renderCatsList(); return; }
+      if (action==='delete') { const isDeletingFallback = oldName===FALLBACK_CATEGORY; const nextCats = categories.filter(c=>c!==oldName); let replacement=''; if (nextCats.length) { replacement = (!isDeletingFallback && nextCats.includes(FALLBACK_CATEGORY)) ? FALLBACK_CATEGORY : nextCats[0]; } const msg = replacement ? `سيتم حذف الفئة "${oldName}". سيتم نقل الأصناف إلى "${replacement}".` : `سيتم حذف الفئة "${oldName}".`; if (!confirm(msg)) return; categories = nextCats; if (categoryImages && categoryImages[oldName]) { delete categoryImages[oldName]; saveCategoryImages(); } saveCategories(); renderCatsList(); }
+    });
+
+    if (els.catSearch) { els.catSearch.addEventListener('input', () => { catQuery = els.catSearch.value || ''; renderCatsList(); }); }
+
+    if (els.btnSaveCats) {
+      els.btnSaveCats.addEventListener('click', async ()=>{
+        const original = els.catsUploadStatus ? els.catsUploadStatus.textContent : '';
+        if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'جارِ الحفظ...';
+        try {
+          const payload = Array.isArray(categories) ? categories.map(name => ({ name, imageUrl: (categoryImages && categoryImages[name]) || '' })) : [];
+          const resp = await fetch(SAVE_CATS_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          const json = await resp.json().catch(()=>({}));
+          if (!resp.ok || !json.ok) throw new Error(json.error||'فشل الحفظ');
+          if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'تم الحفظ ✓';
+        } catch {
+          if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'فشل الحفظ';
+        } finally {
+          setTimeout(()=>{ if (els.catsUploadStatus) els.catsUploadStatus.textContent = original || ''; }, 1500);
+        }
+      });
+    }
+
+    els.catImageFileInput.addEventListener('change', async ()=>{ const file = els.catImageFileInput.files[0]; if (!file || !pendingCatImageName) return; const original = els.catsUploadStatus.textContent; els.catsUploadStatus.textContent='جارِ الرفع...'; try { const dataUrl = await fileToDataURL(file); const resp = await fetch(UPLOAD_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ filename:file.name, data:dataUrl }) }); const json = await resp.json().catch(()=>({})); if (!resp.ok || !json.ok || !json.path) throw new Error(json.error||'فشل الرفع'); categoryImages[pendingCatImageName] = json.path; saveCategoryImages(); renderCatsList(); els.catsUploadStatus.textContent='تم الرفع ✓'; } catch { els.catsUploadStatus.textContent='فشل الرفع'; } finally { pendingCatImageName=null; setTimeout(()=>{ els.catsUploadStatus.textContent=original||''; },1500); els.catImageFileInput.value=''; } });
+
+    (async ()=>{
+      categories = loadCategories();
+      categoryImages = loadCategoryImages();
+      if (!categories.length) {
+        const fromAssets = await loadCategoriesFromAssets();
+        if (Array.isArray(fromAssets) && fromAssets.length) {
+          const names = [];
+          fromAssets.forEach(cat => { if (typeof cat==='string') { names.push(cat); } else if (cat && typeof cat==='object') { const name=(cat.name||'').trim(); if (name) { names.push(name); if (cat.imageUrl) categoryImages[name]=cat.imageUrl; } } });
+          categories = names; saveCategories(); saveCategoryImages();
+        } else {
+          const items = await loadItemsForDerive(); categories = deriveCategoriesFromItems(items); saveCategories();
+        }
+      }
+      renderCatsList();
+    })();
+  </script>
+</body>
+</html>

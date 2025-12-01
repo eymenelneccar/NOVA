@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم القائمة - تخزين محلي مع أصول JSON</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'MSjawhara';
+      src: url('MSjawhara-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    :root {
+      --color-primary: #5A3920;
+      --color-accent: #C7A78A;
+      --color-bg: #F7F5F2;
+      --color-surface: #FFFFFF;
+      --color-text: #1F1F1F;
+      --color-muted: #6B6B6B;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --shadow-sm: 0 6px 14px rgba(0,0,0,.06);
+      --shadow-md: 0 10px 24px rgba(0,0,0,.08);
+      --ring: rgba(90,57,32,.25);
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'MSjawhara', 'Cairo', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
+    .text-primary { color: var(--color-primary); }
+    .bg-primary { background-color: var(--color-primary); }
+    .bg-accent { background-color: var(--color-accent); }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.625rem 1rem; border-radius: var(--radius-md); font-weight:600; transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease; box-shadow: var(--shadow-sm); }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-outline { background:#fff; color: var(--color-text); border:1px solid #e5e7eb; }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn:focus-visible { outline:none; box-shadow: 0 0 0 3px var(--ring); }
+    .input, .select, textarea { border:1px solid #e5e7eb; border-radius: var(--radius-md); padding:.625rem .75rem; transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease; background:#fff; }
+    .input:focus, .select:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--ring); outline:none; }
+    .card { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 1rem; transition: transform .2s ease, box-shadow .2s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    #catTabs { row-gap:.5rem; }
+    #catTabs button { padding:.5rem .9rem; border-radius: 9999px; border:1px solid #e5e7eb; background:#fff; color: var(--color-text); transition: background-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    #catTabs button:hover { background: rgba(90,57,32,.08); }
+    #catTabs button.bg-primary { border-color: var(--color-primary); }
+    img.rounded { border-radius: var(--radius-md); }
+    .navbar { background:#fff; border-bottom:1px solid #e5e7eb; }
+    .brand { font-weight:700; letter-spacing:.3px; }
+    .brand .d { color:#2E7BEF; }
+    .brand .m { color:#F3B501; }
+    .brand-sub { font-size:.7rem; color:#9CA3AF; }
+    .hero-wrap { background:#E1195F; color:#fff; }
+    .pill { background:#FCD34D; color:#111827; border-radius:9999px; padding:.5rem 1rem; font-weight:700; display:inline-flex; align-items:center; gap:.4rem; }
+    .section-title { color:#1F2937; font-weight:700; }
+    .tile { background:#EFE6DD; border-radius:12px; padding:1rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; border:1px solid #E5DED4; min-width:140px; min-height:96px; transition: transform .2s ease, box-shadow .2s ease; }
+    .tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .tile-grid { display:flex; flex-wrap:wrap; gap:.75rem; }
+    .phone { width:270px; max-width:100%; border-radius:36px; background:#0B0B0B; box-shadow: 0 20px 40px rgba(0,0,0,.25); padding:10px; }
+    .phone-screen { border-radius:24px; background:#fff; overflow:hidden; }
+    .phone-screen .iframe-wrap { width:100%; height:520px; overflow:hidden; background:#fff; position:relative; border-radius:24px; }
+    .phone-screen .iframe-wrap iframe { display:block; width:100%; height:100%; border:0; background:#fff; border-radius:inherit; }
+    .footer-links { font-size:.8rem; color:#4B5563; }
+    .footer-links a { color:#2563EB; }
+    .support-btn { position:fixed; right:18px; bottom:18px; width:56px; height:56px; border-radius:9999px; background:#22C55E; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow: var(--shadow-md); }
+    .tiles-xl { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:1rem; }
+    @media (min-width: 1024px) { .tiles-xl { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    .tile-action { background:#EFE6DD; border:1px solid #E5DED4; border-radius:16px; padding:1.25rem; min-height:120px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:800; color:#1F2937; box-shadow: var(--shadow-sm); transition: transform .2s ease, box-shadow .2s ease; }
+    .tile-action:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .tile-action .sub { display:block; font-size:.85rem; color:#6B7280; font-weight:600; margin-top:.25rem; }
+    .tile-action svg { width:20px; height:20px; margin-left:.5rem; color: var(--color-primary); }
+    .tile-action.disabled { background:#E5E7EB; border:1px solid #D1D5DB; color:#9CA3AF; cursor:not-allowed; box-shadow:none; }
+    .tile-action.disabled:hover { transform:none; box-shadow:none; }
+    .tile-action.disabled .sub { color:#9CA3AF; }
+    .tile-action.disabled svg { color:#9CA3AF; }
+    .section-focus { box-shadow: 0 0 0 3px var(--ring); border-radius: var(--radius-lg); }
+  </style>
+</head>
+<body class="min-h-screen p-0 sm:p-0 overflow-y-auto">
+  <nav class="navbar w-full py-2 px-4 sm:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="brand text-lg sm:text-xl">iqr menu</span>
+      <span class="brand-sub">BACKOFFICE</span>
+    </div>
+    <button id="languageToggle" class="text-sm text-gray-600">العربية</button>
+  </nav>
+  <section id="landingSection" class="hero-wrap w-full">
+    <div class="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-12 grid lg:grid-cols-2 gap-6 items-start">
+      <div class="space-y-3">
+        <div class="text-white text-sm">Backoffice</div>
+        <div class="flex items-center gap-3">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-white"><rect x="3" y="3" width="18" height="14" rx="2" stroke-width="2"/><path d="M7 7h10" stroke-width="2"/><path d="M7 11h6" stroke-width="2"/></svg>
+          <h1 class="text-3xl sm:text-5xl font-extrabold">لوحة تحكم القائمة</h1>
+        </div>
+        
+      </div>
+      <div class="flex lg:justify-end">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="iframe-wrap">
+              <iframe src="index.html" title="معاينة الهاتف" loading="lazy" referrerpolicy="no-referrer"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="editorSection" class="">
+  <header class="mb-4 px-4 sm:px-8 pt-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-primary">لوحة تحكم القائمة</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnDownloadAssets" class="btn btn-outline">تحميل</button>
+      </div>
+    </div>
+  </header>
+  <section class="px-4 sm:px-8 mb-8">
+    <div class="tiles-xl">
+      <a id="tileHero" class="tile-action disabled" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><circle cx="8" cy="8" r="2" stroke-width="2"/><path d="M21 15l-4-4-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الــهيرو<span class="sub">تحرير الصورة والنص</span></a>
+      <a id="tileCats" class="tile-action" href="categories.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="8" height="8" rx="1" stroke-width="2"/><rect x="13" y="3" width="8" height="8" rx="1" stroke-width="2"/><rect x="3" y="13" width="8" height="8" rx="1" stroke-width="2"/><rect x="13" y="13" width="8" height="8" rx="1" stroke-width="2"/></svg>إدارة الفئات<span class="sub">الصور والترتيب</span></a>
+      <a id="tileItems" class="tile-action" href="items.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="4" cy="6" r="1" stroke-width="2"/><circle cx="4" cy="12" r="1" stroke-width="2"/><circle cx="4" cy="18" r="1" stroke-width="2"/><path d="M8 6h12" stroke-width="2" stroke-linecap="round"/><path d="M8 12h12" stroke-width="2" stroke-linecap="round"/><path d="M8 18h12" stroke-width="2" stroke-linecap="round"/></svg>إدارة الأصناف<span class="sub">إضافة وتعديل وحذف</span></a>
+      <a id="tileGovs" class="tile-action disabled" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s-6-5.5-6-10a6 6 0 1 1 12 0c0 4.5-6 10-6 10z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="11" r="3" stroke-width="2"/></svg>إدارة المحافظات<span class="sub">أجور التوصيل</span></a>
+      <a id="tileSettings" class="tile-action disabled lg:col-span-2" href="#" aria-disabled="true" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-width="2"/><path d="M19.4 15a7.8 7.8 0 0 0 .1-2l2-1.5-2-3.5-2.3.5a7.8 7.8 0 0 0-1.7-1l-.5-2.3h-4l-.5 2.3a7.8 7.8 0 0 0-1.7 1L4.5 8l-2 3.5L4.4 13a7.8 7.8 0 0 0 .1 2l-2 1.5 2 3.5 2.3-.5a7.8 7.8 0 0 0 1.7 1l.5 2.3h4l.5-2.3a7.8 7.8 0 0 0 1.7-1l2.3.5 2-3.5-2-1.5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>الإعدادات<span class="sub">خيارات عامة للواجهة</span></a>
+    </div>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-8 hidden">
+    <section>
+      <nav id="catTabs" class="flex flex-wrap gap-2 mb-4"></nav>
+      <div id="itemsGrid" class="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+      <p id="emptyMsg" class="text-center text-gray-500 mt-8 hidden">لا توجد أصناف بعد. استخدم زر "إضافة صنف" للبدء.</p>
+    </section>
+  </main>
+
+  <!-- نافذة نموذج إضافة/تعديل -->
+  <div id="editModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-xl mx-auto mt-16 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h2 id="modalTitle" class="text-xl font-bold text-primary">إضافة صنف</h2>
+      </div>
+      <form id="itemForm" class="p-6 space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">اسم الصنف</label>
+            <input id="fName" type="text" required class="input w-full" placeholder="مثال: القهوة التركية" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">الفئة</label>
+            <select id="fCategory" class="select w-full">
+              <option>القهوة</option>
+              <option>الشاي</option>
+              <option>العصائر</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">السعر (د.ع)</label>
+            <input id="fPrice" type="number" min="0" step="1" class="input w-full" placeholder="مثال: 18" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">رابط الصورة (اختياري)</label>
+            <input id="fImage" type="text" inputmode="url" class="input w-full" placeholder="https://... أو assets/images/…" />
+            <div class="flex items-center gap-2 mt-2">
+              <button type="button" id="btnUploadImage" class="btn btn-outline">رفع صورة</button>
+              <span id="uploadStatus" class="text-xs text-gray-500"></span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">اختر ملف صورة وسيتم رفعه ثم إدراج مساره تلقائيًا.</p>
+          </div>
+        </div>
+        <!-- قسم الأحجام والمتغيرات (ديناميكي) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-primary">الأحجام</h3>
+            <button type="button" id="btnAddVariant" class="btn btn-outline">إضافة حجم</button>
+          </div>
+          <div id="variantsList" class="space-y-2">
+            <!-- يتم إضافة الأحجام ديناميكياً هنا -->
+          </div>
+          <p class="text-xs text-gray-500">أضف أي أحجام ترغب بها وحدد السعر والنوع (اختياري). سيتم اعتماد أقل سعر كـ "ابتداءً من" ويُملأ حقل السعر الأعلى تلقائيًا.</p>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">الوصف</label>
+          <textarea id="fDesc" rows="3" class="input w-full" placeholder="وصف قصير للصنف"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="btnCancel" class="btn btn-outline">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تأكيد الحذف -->
+  <div id="confirmModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-32 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-lg font-bold text-primary">تأكيد الحذف</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-700">هل تريد بالتأكيد حذف هذا الصنف؟ لا يمكن التراجع عن هذه العملية.</p>
+        <div class="flex items-center justify-end gap-3 mt-6">
+          <button type="button" id="btnCancelDelete" class="px-4 py-2 rounded-lg border">إلغاء</button>
+          <button type="button" id="btnConfirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white">حذف</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+  <!-- نافذة إضافة/تعديل عنوان H2 داخل الفئة -->
+  <div id="headingModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-24 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h3 id="headingModalTitle" class="text-lg font-bold text-primary">إضافة عنوان H2</h3>
+      </div>
+      <form id="headingForm" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">نص العنوان</label>
+          <input id="hText" type="text" required class="w-full border rounded-lg px-3 py-2" placeholder="مثال: المشروبات الساخنة" />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">الفئة</label>
+          <select id="hCategory" class="w-full border rounded-lg px-3 py-2"></select>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" id="btnHeadingCancel" class="px-4 py-2 rounded-lg border">إلغاء</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة إدارة الفئات -->
+  <div id="catsModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-24 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-lg font-bold text-primary">إدارة الفئات</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex gap-2">
+          <input id="newCatName" type="text" class="input flex-1" placeholder="اسم فئة جديدة" />
+          <button id="btnAddCat" class="btn btn-primary">إضافة</button>
+        </div>
+        <ul id="catsList" class="space-y-2"></ul>
+        <span id="catsUploadStatus" class="text-xs text-gray-500"></span>
+        <div class="flex justify-end">
+          <button id="btnCloseCats" class="btn btn-outline">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إدارة المحافظات -->
+  <div id="govsModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-24 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-lg font-bold text-primary">إدارة المحافظات</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-3 gap-2">
+          <input id="newGovName" type="text" class="input col-span-2" placeholder="اسم المحافظة" />
+          <input id="newGovFee" type="number" min="0" step="1" class="input" placeholder="الأجور" />
+        </div>
+        <button id="btnAddGov" class="btn btn-primary">إضافة</button>
+        <ul id="govsList" class="space-y-2"></ul>
+        <div class="flex justify-end">
+          <button id="btnCloseGovs" class="btn btn-outline">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة الإعدادات العامة -->
+  <div id="settingsModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-24 bg-white rounded-xl shadow-lg overflow-hidden max-h-[85vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-lg font-bold text-primary">الإعدادات العامة</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">اللون الأساسي</label>
+          <input type="color" id="primaryColorPicker" class="w-20 h-10 p-0 border rounded" value="#5A3920" />
+        </div>
+        <div class="text-xs text-gray-500">يمكنك ضبط اللون الأساسي للواجهة؛ يُطبق فورًا دون حفظ.</div>
+        <div class="flex justify-end">
+          <button id="btnCloseSettings" class="btn btn-outline">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+  <script>
+    const STORAGE_KEY = 'menu_assets';
+    const SAVE_ENDPOINT = '/api/save-menu';
+    const SAVE_HERO_ENDPOINT = '/api/save-hero';
+    const SAVE_CATS_ENDPOINT = '/api/save-categories';
+    const UPLOAD_ENDPOINT = '/api/upload-image';
+    const CATS_KEY = 'menu_categories';
+    const CATS_IMAGES_KEY = 'menu_category_images';
+    const FALLBACK_CATEGORY = 'أخرى';
+    const SAVE_GOVS_ENDPOINT = '/api/save-governorates';
+    const GOVS_KEY = 'menu_governorates';
+
+    const defaultItems = [
+      {
+        id: Date.now() - 1,
+        name: 'القهوة التركية',
+        category: 'القهوة',
+        price: 18,
+        description: 'قهوة قوية بطابع شرقي، تُحضّر على نار هادئة مع رغوة خفيفة.',
+        imageUrl: 'https://placehold.co/400x300/5A3920/FFFFFF?text=تركية'
+      },
+      {
+        id: Date.now(),
+        name: 'شاي مثلج بالخوخ',
+        category: 'الشاي',
+        price: 18,
+        description: 'حلو وبارد، مثالي لتهدئة الأعصاب في الأجواء الحارة.',
+        imageUrl: 'https://placehold.co/400x300/F5CBA7/5A3920?text=شاي+مثلج'
+      }
+    ];
+
+    let items = [];
+    let categories = [];
+    let governorates = [];
+    let editingId = null;
+    let pendingDeleteId = null;
+    let categoryImages = {};
+    let pendingCatImageName = null;
+    let activeCategory = '';
+
+    const els = {
+      grid: document.getElementById('itemsGrid'),
+      empty: document.getElementById('emptyMsg'),
+      catTabs: document.getElementById('catTabs'),
+      btnAdd: document.getElementById('btnAdd'),
+      btnAddHeading: document.getElementById('btnAddHeading'),
+      btnSave: document.getElementById('btnSave'),
+      btnImport: document.getElementById('btnImport'),
+      fileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })(),
+      editModal: document.getElementById('editModal'),
+      headingModal: document.getElementById('headingModal'),
+      headingModalTitle: document.getElementById('headingModalTitle'),
+      headingForm: document.getElementById('headingForm'),
+      hText: document.getElementById('hText'),
+      hCategory: document.getElementById('hCategory'),
+      btnHeadingCancel: document.getElementById('btnHeadingCancel'),
+      modalTitle: document.getElementById('modalTitle'),
+      form: document.getElementById('itemForm'),
+      fName: document.getElementById('fName'),
+      fCategory: document.getElementById('fCategory'),
+      fPrice: document.getElementById('fPrice'),
+      fImage: document.getElementById('fImage'),
+      fDesc: document.getElementById('fDesc'),
+      // أحجام ومتغيرات (ديناميكية)
+      variantsList: document.getElementById('variantsList'),
+      btnAddVariant: document.getElementById('btnAddVariant'),
+      btnCancel: document.getElementById('btnCancel'),
+      confirmModal: document.getElementById('confirmModal'),
+      btnCancelDelete: document.getElementById('btnCancelDelete'),
+      btnConfirmDelete: document.getElementById('btnConfirmDelete'),
+      btnUploadImage: document.getElementById('btnUploadImage'),
+      uploadStatus: document.getElementById('uploadStatus'),
+      // عناصر الهيرو
+      heroForm: document.getElementById('heroForm'),
+      heroTitle: document.getElementById('heroTitle'),
+      heroImage: document.getElementById('heroImage'),
+      btnUploadHeroImage: document.getElementById('btnUploadHeroImage'),
+      heroUploadStatus: document.getElementById('heroUploadStatus'),
+      btnSaveHero: document.getElementById('btnSaveHero'),
+      heroPreviewImg: document.getElementById('heroPreviewImg'),
+      heroPreviewTitle: document.getElementById('heroPreviewTitle'),
+      imageFileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })(),
+      heroImageFileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })(),
+      btnManageCats: document.getElementById('btnManageCats'),
+      btnManageGovs: document.getElementById('btnManageGovs'),
+      catsModal: document.getElementById('catsModal'),
+      catsList: document.getElementById('catsList'),
+      newCatName: document.getElementById('newCatName'),
+      btnAddCat: document.getElementById('btnAddCat'),
+      btnCloseCats: document.getElementById('btnCloseCats'),
+      catsUploadStatus: document.getElementById('catsUploadStatus'),
+      govsModal: document.getElementById('govsModal'),
+      govsList: document.getElementById('govsList'),
+      newGovName: document.getElementById('newGovName'),
+      newGovFee: document.getElementById('newGovFee'),
+      btnAddGov: document.getElementById('btnAddGov'),
+      btnCloseGovs: document.getElementById('btnCloseGovs'),
+      catImageFileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })(),
+      landing: document.getElementById('landingSection'),
+      editorSection: document.getElementById('editorSection'),
+      languageToggle: document.getElementById('languageToggle'),
+      tileHero: document.getElementById('tileHero'),
+      tileCats: document.getElementById('tileCats'),
+      tileItems: document.getElementById('tileItems'),
+      tileGovs: document.getElementById('tileGovs'),
+      tileSettings: document.getElementById('tileSettings'),
+      btnDownloadAssets: document.getElementById('btnDownloadAssets'),
+    };
+
+    function showEditor() {
+      if (els.landing) els.landing.classList.add('hidden');
+      if (els.editorSection) els.editorSection.classList.remove('hidden');
+    }
+    function showLanding() {
+      if (els.editorSection) els.editorSection.classList.add('hidden');
+      if (els.landing) els.landing.classList.remove('hidden');
+    }
+
+    async function loadData() {
+      let localItems = [];
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) localItems = parsed;
+        }
+      } catch {}
+      try {
+        const resp = await fetch('assets/menu.json', { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data)) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            return data;
+          }
+        }
+      } catch {}
+      if (Array.isArray(localItems) && localItems.length) return localItems;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultItems));
+      return [...defaultItems];
+    }
+
+    function loadCategoryImages() {
+      try {
+        const raw = localStorage.getItem(CATS_IMAGES_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch {}
+      return {};
+    }
+
+    function saveCategoryImages() {
+      localStorage.setItem(CATS_IMAGES_KEY, JSON.stringify(categoryImages || {}));
+    }
+
+    async function loadCategoriesFromAssets() {
+      try {
+        const resp = await fetch('assets/categories.json', { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data)) return data;
+        }
+      } catch {}
+      return [];
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function loadCategories() {
+      try {
+        const raw = localStorage.getItem(CATS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch {}
+      return [];
+    }
+
+    function saveCategories() {
+      localStorage.setItem(CATS_KEY, JSON.stringify(categories));
+    }
+
+    function deriveCategoriesFromItems(itemsArr) {
+      const set = new Set(itemsArr.map(i => (i.category || '').trim()).filter(Boolean));
+      if (!set.size) {
+        ['القهوة','الشاي','العصائر'].forEach(c => set.add(c));
+      }
+      return Array.from(set);
+    }
+
+    function renderItems() {
+      renderCatTabs();
+      els.grid.innerHTML = '';
+      const list = activeCategory ? items.filter(x => (x.category || '') === activeCategory) : items.slice();
+      if (!list.length) {
+        els.empty.textContent = activeCategory ? `لا توجد أصناف في فئة "${activeCategory}".` : 'لا توجد أصناف بعد. استخدم زر "إضافة صنف" للبدء.';
+        els.empty.classList.remove('hidden');
+        return;
+      }
+      els.empty.classList.add('hidden');
+      list.forEach(item => {
+        const card = document.createElement('div');
+        const isHeading = (item.type || 'item') === 'heading';
+        card.className = isHeading
+          ? 'card flex flex-col cursor-default'
+          : 'card flex flex-col cursor-pointer';
+        card.setAttribute('data-card-id', String(item.id));
+        card.setAttribute('data-type', isHeading ? 'heading' : 'item');
+        if (isHeading) {
+          card.innerHTML = `
+            <div class="flex-1">
+              <h2 class="text-xl sm:text-2xl font-bold text-primary mb-2 border-b-2 border-primary/30 pb-1">${item.name}</h2>
+              <p class="text-xs sm:text-sm text-gray-600">الفئة: ${item.category}</p>
+            </div>
+            <div class="flex items-center justify-end pt-3 mt-2">
+              <div class="flex items-center gap-2">
+                <button class="px-3 py-1 rounded-lg border text-sm sm:text-base" data-action="edit" data-id="${item.id}">تعديل</button>
+                <button class="px-3 py-1 rounded-lg bg-red-600 text-white text-sm sm:text-base" data-action="delete" data-id="${item.id}">حذف</button>
+              </div>
+            </div>
+          `;
+          els.grid.appendChild(card);
+          return;
+        }
+        card.innerHTML = `
+          <img src="${item.imageUrl || ''}" alt="${item.name}" class="w-full h-36 sm:h-40 object-cover rounded-lg border mb-3" onerror="this.style.display='none'" style="${item.imageUrl ? '' : 'display:none;'}" />
+          <div class="flex-1">
+            <h3 class="text-lg sm:text-xl font-bold text-primary mb-1">${item.name}</h3>
+            <p class="text-xs sm:text-sm text-gray-600 mb-1">الفئة: ${item.category}</p>
+            <p class="text-xs sm:text-sm text-gray-600 mb-2">${item.description || ''}</p>
+          </div>
+          <div class="flex items-center justify-between border-t pt-3 mt-2">
+            <span class="text-base sm:text-lg font-semibold text-gray-800">${(Number.isFinite(Number(item.price)) && Number(item.price) > 0) ? (Number(item.price).toLocaleString('ar-IQ') + ' د.ع') : ''}</span>
+            <div class="flex items-center gap-2">
+              <button class="px-3 py-1 rounded-lg border text-sm sm:text-base" data-action="edit" data-id="${item.id}">تعديل</button>
+              <button class="px-3 py-1 rounded-lg bg-red-600 text-white text-sm sm:text-base" data-action="delete" data-id="${item.id}">حذف</button>
+            </div>
+          </div>
+        `;
+        els.grid.appendChild(card);
+      });
+    }
+
+    function renderCategoryOptions(selected) {
+      const opts = Array.isArray(categories) ? [...categories] : [];
+      if (selected && !opts.includes(selected)) opts.unshift(selected);
+      els.fCategory.innerHTML = opts.map(c => `<option>${c}</option>`).join('');
+      if (selected) els.fCategory.value = selected;
+    }
+
+    // شريط الفئات القابل للنقر للتصفية
+    function renderCatTabs() {
+      if (!els.catTabs) return;
+      const cats = Array.isArray(categories) ? categories : [];
+      const btnCls = 'px-3 py-1 rounded-full border transition';
+      const activeCls = 'bg-primary text-white';
+      const inactiveCls = 'hover:bg-primary/10';
+      const makeBtn = (cat, label, isActive) => `
+        <button data-cat="${cat}" class="${btnCls} ${isActive ? activeCls : inactiveCls}">${label}</button>`;
+      const allBtn = makeBtn('', 'الكل', activeCategory === '');
+      const catBtns = cats.map(c => makeBtn(c, c, c === activeCategory));
+      els.catTabs.innerHTML = [allBtn, ...catBtns].join('');
+    }
+
+    if (els.catTabs) {
+      els.catTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-cat]');
+        if (!btn) return;
+        activeCategory = btn.getAttribute('data-cat') || '';
+        renderCatTabs();
+        renderItems();
+      });
+    }
+
+    // خيارات فئة عنوان H2
+    function renderHeadingCategoryOptions(selected) {
+      const opts = Array.isArray(categories) ? [...categories] : [];
+      if (selected && !opts.includes(selected)) opts.unshift(selected);
+      els.hCategory.innerHTML = opts.map(c => `<option>${c}</option>`).join('');
+      if (selected) els.hCategory.value = selected;
+    }
+
+    // فتح مودال إضافة/تعديل عنوان H2
+    function openHeadingModal(item) {
+      els.headingModalTitle.textContent = item ? 'تعديل عنوان H2' : 'إضافة عنوان H2';
+      editingId = item ? item.id : null;
+      els.hText.value = item?.name || '';
+      renderHeadingCategoryOptions(item?.category || categories[0] || 'القهوة');
+      els.headingModal.classList.remove('hidden');
+    }
+
+    function closeHeadingModal() {
+      els.headingModal.classList.add('hidden');
+      if (els.headingForm) els.headingForm.reset();
+      editingId = null;
+    }
+
+    // أحداث العنوان H2
+    if (els.btnAddHeading) els.btnAddHeading.addEventListener('click', () => openHeadingModal(null));
+    if (els.btnHeadingCancel) els.btnHeadingCancel.addEventListener('click', closeHeadingModal);
+    if (els.headingForm) els.headingForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = (els.hText.value || '').trim();
+      const category = (els.hCategory.value || '').trim();
+      if (!name) return;
+      if (editingId != null) {
+        items = items.map(x => x.id === editingId ? { ...x, type: 'heading', name, category, price: 0, imageUrl: '', description: '' } : x);
+      } else {
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        items.push({ id, type: 'heading', name, category, price: 0, imageUrl: '', description: '' });
+      }
+      saveData();
+      renderItems();
+      closeHeadingModal();
+    });
+
+    function openEditModal(item) {
+      els.modalTitle.textContent = item ? 'تعديل صنف' : 'إضافة صنف';
+      editingId = item ? item.id : null;
+      els.fName.value = item?.name || '';
+      renderCategoryOptions(item?.category || categories[0] || 'القهوة');
+      els.fPrice.value = item?.price != null ? item.price : '';
+      els.fImage.value = item?.imageUrl || '';
+      els.fDesc.value = item?.description || '';
+
+      // إعداد الأحجام بشكل ديناميكي
+      const vars = Array.isArray(item?.variants) ? item.variants : [];
+      if (els.variantsList) {
+        els.variantsList.innerHTML = '';
+        const genKey = () => 'v' + Date.now() + Math.floor(Math.random() * 1000);
+        const updateTopPrice = () => {
+          const rows = els.variantsList.querySelectorAll('.variant-row');
+          const prices = Array.from(rows).map(r => Number(r.querySelector('.var-price').value)).filter(p => Number.isFinite(p) && p > 0);
+          if (prices.length) els.fPrice.value = String(Math.min(...prices));
+        };
+        const addRow = (data = {}) => {
+          const row = document.createElement('div');
+          row.className = 'grid sm:grid-cols-6 gap-2 items-end variant-row';
+          row.setAttribute('data-key', String(data.key || genKey()));
+          row.innerHTML = `
+            <div class="sm:col-span-2">
+              <label class="block text-sm text-gray-700 mb-1">اسم الحجم</label>
+              <input type="text" class="var-label input w-full" placeholder="مثال: صغير / وسط / كبير" value="${(data.label || '').replace(/"/g,'&quot;')}">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-sm text-gray-700 mb-1">السعر (د.ع)</label>
+              <input type="number" min="0" step="1" class="var-price input w-full" placeholder="مثال: 8000" value="${Number(data.price || 0) || ''}">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-sm text-gray-700 mb-1">النوع (اختياري)</label>
+              <input type="text" class="var-type input w-full" placeholder="مثال: عادي / رفيع" value="${(data.variantType || '').replace(/"/g,'&quot;')}">
+            </div>
+            <div class="sm:col-span-6 flex justify-end">
+              <button type="button" class="btn-remove-variant px-2 py-1 rounded-lg bg-red-600 text-white">حذف</button>
+            </div>
+          `;
+          els.variantsList.appendChild(row);
+          const btnRemove = row.querySelector('.btn-remove-variant');
+          if (btnRemove) btnRemove.addEventListener('click', () => { row.remove(); updateTopPrice(); });
+          const priceEl = row.querySelector('.var-price');
+          if (priceEl) priceEl.addEventListener('input', updateTopPrice);
+        };
+        vars.forEach(v => addRow(v));
+        if (els.btnAddVariant) {
+          els.btnAddVariant.onclick = () => addRow();
+        }
+        updateTopPrice();
+      }
+
+      els.editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      els.editModal.classList.add('hidden');
+      editingId = null;
+      els.form.reset();
+    }
+
+    function openConfirmDelete(id) {
+      pendingDeleteId = id;
+      els.confirmModal.classList.remove('hidden');
+    }
+
+    function closeConfirmDelete() {
+      pendingDeleteId = null;
+      els.confirmModal.classList.add('hidden');
+    }
+
+    // حفظ البيانات مباشرة إلى ملف الأصول عبر خادم محلي
+    async function saveToServer() {
+      const original = els.btnSave.textContent;
+      els.btnSave.textContent = 'جارِ الحفظ...';
+      els.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items)
+        });
+        if (!resp.ok) throw new Error('فشل الحفظ');
+        els.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { els.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        console.warn(e);
+        els.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { els.btnSave.textContent = original; }, 2500);
+      } finally {
+        els.btnSave.disabled = false;
+      }
+    }
+
+    async function saveAllToServer() {
+      const original = els.btnSave.textContent;
+      els.btnSave.textContent = 'جارِ الحفظ...';
+      els.btnSave.disabled = true;
+      try {
+        // حفظ الأصناف
+        const respItems = await fetch(SAVE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items)
+        });
+        if (!respItems.ok) throw new Error('فشل حفظ الأصناف');
+        // حفظ الفئات ككائنات {name, imageUrl}
+        const categoriesPayload = (Array.isArray(categories) ? categories : []).map(name => ({
+          name,
+          imageUrl: (categoryImages && categoryImages[name]) ? categoryImages[name] : ''
+        }));
+        const respCats = await fetch(SAVE_CATS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categoriesPayload)
+        });
+        if (!respCats.ok) throw new Error('فشل حفظ الفئات');
+        // حفظ المحافظات ككائنات {name, fee}
+        const govsPayload = (Array.isArray(governorates) ? governorates : []).map(g => ({
+          name: (g && typeof g === 'object' ? (g.name || '') : String(g || '')).trim(),
+          fee: Number(g && typeof g === 'object' ? g.fee : 0) || 0
+        })).filter(g => g.name);
+        const respGovs = await fetch(SAVE_GOVS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(govsPayload)
+        });
+        if (!respGovs.ok) throw new Error('فشل حفظ المحافظات');
+        els.btnSave.textContent = 'تم الحفظ ✓';
+      } catch (e) {
+        console.warn(e);
+        els.btnSave.textContent = 'خطأ في الحفظ';
+      } finally {
+        setTimeout(() => { els.btnSave.textContent = original; }, 1500);
+        els.btnSave.disabled = false;
+      }
+    }
+
+    // رفع صورة وإدراج مسارها تلقائيًا في الحقل
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadImageFile(file) {
+      if (!file) return;
+      const original = els.uploadStatus.textContent;
+      els.uploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, data: dataUrl })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        els.fImage.value = json.path;
+        els.uploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        console.warn('خطأ رفع الصورة', e);
+        els.uploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => { els.uploadStatus.textContent = original || ''; }, 2000);
+        els.imageFileInput.value = '';
+      }
+    }
+
+    // رفع صورة الهيرو وإدراج مسارها تلقائيًا في الحقل
+    async function uploadHeroImage(file) {
+      if (!file) return;
+      const original = els.heroUploadStatus ? els.heroUploadStatus.textContent : '';
+      if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, data: dataUrl })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        if (els.heroImage) els.heroImage.value = json.path;
+        updateHeroPreview();
+        if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        console.warn('خطأ رفع صورة الهيرو', e);
+        if (els.heroUploadStatus) els.heroUploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => { if (els.heroUploadStatus) els.heroUploadStatus.textContent = original || ''; }, 2000);
+        if (els.heroImageFileInput) els.heroImageFileInput.value = '';
+      }
+    }
+
+    function updateHeroPreview() {
+      if (els.heroPreviewImg) els.heroPreviewImg.src = (els.heroImage && els.heroImage.value) || '';
+      if (els.heroPreviewTitle) els.heroPreviewTitle.textContent = (els.heroTitle && els.heroTitle.value) || '';
+    }
+
+    // إعدادات عامة: تغيير اللون الأساسي مباشرة
+    (function initSettings() {
+      const picker = document.getElementById('primaryColorPicker');
+      const btnClose = document.getElementById('btnCloseSettings');
+      const modal = document.getElementById('settingsModal');
+      if (picker) {
+        picker.addEventListener('input', () => {
+          const val = picker.value || '#5A3920';
+          document.documentElement.style.setProperty('--color-primary', val);
+        });
+      }
+      if (btnClose && modal) {
+        btnClose.addEventListener('click', () => modal.classList.add('hidden'));
+      }
+    })();
+
+    async function loadHeroFromAssets() {
+      try {
+        const resp = await fetch('assets/hero.json', { cache: 'no-store' });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (els.heroTitle) els.heroTitle.value = (data.title || '');
+        const fallbackHero = 'assets/images/17a7a6365dcde068822d456917306995.jpg';
+        if (els.heroImage) els.heroImage.value = (data.imageUrl || fallbackHero);
+        updateHeroPreview();
+      } catch (e) { console.warn('تعذّر تحميل hero.json', e); }
+    }
+
+    async function saveHeroToServer() {
+      const payload = {
+        title: (els.heroTitle && els.heroTitle.value) || '',
+        imageUrl: (els.heroImage && els.heroImage.value) || '',
+      };
+      const originalText = els.btnSaveHero ? els.btnSaveHero.textContent : '';
+      if (els.btnSaveHero) { els.btnSaveHero.textContent = 'جارِ الحفظ...'; els.btnSaveHero.disabled = true; }
+      try {
+        const resp = await fetch(SAVE_HERO_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok) throw new Error(json.error || 'تعذّر حفظ الهيرو');
+        if (els.btnSaveHero) els.btnSaveHero.textContent = 'تم الحفظ ✓';
+      } catch (e) {
+        console.error('فشل حفظ الهيرو', e);
+        if (els.btnSaveHero) els.btnSaveHero.textContent = 'فشل الحفظ';
+      } finally {
+        setTimeout(() => { if (els.btnSaveHero) { els.btnSaveHero.textContent = originalText || 'حفظ الهيرو'; els.btnSaveHero.disabled = false; } }, 1500);
+      }
+    }
+
+    async function uploadCatImageFile(file) {
+      if (!file || !pendingCatImageName) return;
+      const original = els.catsUploadStatus ? els.catsUploadStatus.textContent : '';
+      if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, data: dataUrl })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        categoryImages[pendingCatImageName] = json.path;
+        saveCategoryImages();
+        renderCatsList();
+        if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        console.warn('خطأ رفع صورة الفئة', e);
+        if (els.catsUploadStatus) els.catsUploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        pendingCatImageName = null;
+        setTimeout(() => { if (els.catsUploadStatus) els.catsUploadStatus.textContent = original || ''; }, 2000);
+        els.catImageFileInput.value = '';
+      }
+    }
+
+    // استيراد بيانات JSON من ملف محلي
+    function importJson() {
+      els.fileInput.onchange = async () => {
+        const file = els.fileInput.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (Array.isArray(data)) {
+            items = data;
+            categories = deriveCategoriesFromItems(items);
+            saveCategories();
+            saveData();
+            governorates = loadGovernorates();
+      if (!governorates.length) {
+        const fromGovAssets = await loadGovernoratesFromAssets();
+        if (Array.isArray(fromGovAssets) && fromGovAssets.length) {
+          governorates = fromGovAssets;
+          saveGovernorates();
+        }
+      }
+      renderItems();
+          }
+        } catch (e) {
+          console.warn('ملف JSON غير صالح', e);
+        } finally {
+          els.fileInput.value = '';
+        }
+      };
+      els.fileInput.click();
+    }
+
+    // أحداث عامة
+    if (els.btnAdd) els.btnAdd.addEventListener('click', () => openEditModal(null));
+    if (els.btnSave) els.btnSave.addEventListener('click', saveAllToServer);
+    if (els.btnImport) els.btnImport.addEventListener('click', importJson);
+    els.btnUploadImage.addEventListener('click', () => els.imageFileInput.click());
+    els.imageFileInput.addEventListener('change', () => uploadImageFile(els.imageFileInput.files[0]));
+    els.catImageFileInput.addEventListener('change', () => uploadCatImageFile(els.catImageFileInput.files[0]));
+    els.btnCancel.addEventListener('click', closeEditModal);
+    els.btnCancelDelete.addEventListener('click', closeConfirmDelete);
+    els.btnConfirmDelete.addEventListener('click', () => {
+      if (pendingDeleteId == null) return;
+      items = items.filter(x => x.id !== pendingDeleteId);
+      saveData();
+      renderItems();
+      closeConfirmDelete();
+    });
+
+    // أحداث قسم الهيرو
+    if (els.heroTitle) els.heroTitle.addEventListener('input', () => updateHeroPreview());
+    if (els.heroImage) els.heroImage.addEventListener('input', () => updateHeroPreview());
+    if (els.btnUploadHeroImage) els.btnUploadHeroImage.addEventListener('click', () => {
+      if (els.heroImageFileInput) els.heroImageFileInput.click();
+    });
+    if (els.heroImageFileInput) els.heroImageFileInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      uploadHeroImage(file);
+    });
+    if (els.btnSaveHero) els.btnSaveHero.addEventListener('click', () => {
+      saveHeroToServer();
+    });
+
+    if (els.languageToggle) {
+      els.languageToggle.addEventListener('click', () => {});
+    }
+
+    // إدارة الفئات: فتح/إغلاق وإضافة/إعادة تسمية/حذف
+    function openCatsModal() {
+      els.catsModal.classList.remove('hidden');
+      renderCatsList();
+    }
+
+    function closeCatsModal() {
+      els.catsModal.classList.add('hidden');
+      if (els.newCatName) els.newCatName.value = '';
+    }
+
+    function renderCatsList() {
+      if (!Array.isArray(categories)) categories = [];
+      els.catsList.innerHTML = categories.map((c, i) => `
+        <li class="flex items-center justify-between border rounded-lg px-2 py-2 sm:px-3">
+          <div class="flex items-center gap-3">
+            <img src="${(categoryImages && categoryImages[c]) || ''}" alt="صورة ${c}" class="w-12 h-12 object-cover rounded border" onerror="this.style.display='none'" style="${(categoryImages && categoryImages[c]) ? '' : 'display:none;'}" />
+            <span class="text-gray-800 text-sm sm:text-base">${c}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base ${i === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${i === 0 ? 'disabled' : ''} data-action="moveUp" data-index="${i}">⬆</button>
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base ${i === categories.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}" ${i === categories.length - 1 ? 'disabled' : ''} data-action="moveDown" data-index="${i}">⬇</button>
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base" data-action="uploadImg" data-name="${c}">رفع صورة</button>
+            ${(categoryImages && categoryImages[c]) ? `<button type=\"button\" class=\"px-2 py-1 rounded-lg border text-sm sm:text-base\" data-action=\"removeImg\" data-name=\"${c}\">حذف الصورة</button>` : ''}
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base" data-action="rename" data-name="${c}">إعادة تسمية</button>
+            <button type="button" class="px-2 py-1 rounded-lg bg-red-600 text-white text-sm sm:text-base" data-action="delete" data-name="${c}">حذف</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    if (els.btnManageCats) els.btnManageCats.addEventListener('click', openCatsModal);
+    els.btnCloseCats.addEventListener('click', closeCatsModal);
+    els.btnAddCat.addEventListener('click', () => {
+      const name = (els.newCatName.value || '').trim();
+      if (!name) return;
+      if (!categories.includes(name)) {
+        categories.push(name);
+        saveCategories();
+        renderCatsList();
+      }
+      els.newCatName.value = '';
+    });
+
+    els.catsList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      const oldName = btn.getAttribute('data-name');
+
+      if (action === 'uploadImg') {
+        pendingCatImageName = oldName;
+        els.catImageFileInput.click();
+        return;
+      } else if (action === 'removeImg') {
+        if (categoryImages && categoryImages[oldName]) {
+          delete categoryImages[oldName];
+          saveCategoryImages();
+          renderCatsList();
+        }
+        return;
+      } else if (action === 'rename') {
+        const newName = prompt('الاسم الجديد للفئة:', oldName);
+        if (!newName) return;
+        const finalName = newName.trim();
+        if (finalName === oldName) return;
+        if (categories.includes(finalName)) {
+          alert('اسم الفئة موجود بالفعل. يرجى اختيار اسم آخر.');
+          return;
+        }
+        const idx = categories.indexOf(oldName);
+        if (idx > -1) {
+          categories[idx] = finalName;
+          items = items.map(x => x.category === oldName ? { ...x, category: finalName } : x);
+          // نقل صورة الفئة إن وُجدت
+          if (categoryImages && categoryImages[oldName]) {
+            categoryImages[finalName] = categoryImages[oldName];
+            delete categoryImages[oldName];
+            saveCategoryImages();
+          }
+          saveCategories();
+          saveData();
+          renderItems();
+          renderCatsList();
+        }
+      } else if (action === 'moveUp' || action === 'moveDown') {
+        const idx = Number(btn.getAttribute('data-index'));
+        if (Number.isInteger(idx)) {
+          if (action === 'moveUp' && idx > 0) {
+            const tmp = categories[idx - 1];
+            categories[idx - 1] = categories[idx];
+            categories[idx] = tmp;
+          } else if (action === 'moveDown' && idx < categories.length - 1) {
+            const tmp = categories[idx + 1];
+            categories[idx + 1] = categories[idx];
+            categories[idx] = tmp;
+          }
+          saveCategories();
+          renderCatsList();
+        }
+      } else if (action === 'delete') {
+        const isDeletingFallback = oldName === FALLBACK_CATEGORY;
+        const nextCats = categories.filter(c => c !== oldName);
+        let replacement = '';
+        if (nextCats.length) {
+          if (!isDeletingFallback && nextCats.includes(FALLBACK_CATEGORY)) {
+            replacement = FALLBACK_CATEGORY;
+          } else {
+            replacement = nextCats[0];
+          }
+        }
+        const msg = replacement
+          ? `سيتم حذف الفئة "${oldName}". سيتم نقل الأصناف إلى "${replacement}".`
+          : `سيتم حذف الفئة "${oldName}". لن تُسند الأصناف إلى أي فئة.`;
+        if (!confirm(msg)) return;
+        categories = nextCats;
+        items = items.map(x => x.category === oldName ? { ...x, category: replacement } : x);
+        // حذف صورة الفئة إن وُجدت
+        if (categoryImages && categoryImages[oldName]) {
+          delete categoryImages[oldName];
+          saveCategoryImages();
+        }
+        saveCategories();
+        saveData();
+        renderItems();
+        renderCatsList();
+      }
+    });
+
+    // إدارة المحافظات: فتح/إغلاق/إضافة/تعديل الأجور/حذف
+    function openGovsModal() {
+      els.govsModal.classList.remove('hidden');
+      renderGovsList();
+    }
+
+    function closeGovsModal() {
+      els.govsModal.classList.add('hidden');
+      if (els.newGovName) els.newGovName.value = '';
+      if (els.newGovFee) els.newGovFee.value = '';
+    }
+
+    function sanitizeGovEntry(g) {
+      if (!g) return null;
+      if (typeof g === 'string') return { name: g.trim(), fee: 0 };
+      const name = (g.name || '').trim();
+      const fee = Number(g.fee) || 0;
+      if (!name) return null;
+      return { name, fee };
+    }
+
+    async function loadGovernoratesFromAssets() {
+      try {
+        const resp = await fetch('assets/governorates.json', { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data)) {
+            return data.map(sanitizeGovEntry).filter(Boolean);
+          }
+        }
+      } catch {}
+      return [];
+    }
+
+    function loadGovernorates() {
+      try {
+        const raw = localStorage.getItem(GOVS_KEY);
+        if (raw) {
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr)) return arr.map(sanitizeGovEntry).filter(Boolean);
+        }
+      } catch {}
+      return [];
+    }
+
+    function saveGovernorates() {
+      localStorage.setItem(GOVS_KEY, JSON.stringify(governorates));
+    }
+
+    function renderGovsList() {
+      if (!Array.isArray(governorates)) governorates = [];
+      els.govsList.innerHTML = governorates.map((g, i) => `
+        <li class="flex items-center justify-between border rounded-lg px-2 py-2 sm:px-3">
+          <div class="flex items-center gap-3">
+            <span class="text-gray-800 text-sm sm:text-base">
+              ${g.name}
+            </span>
+            <span class="text-gray-600 text-xs sm:text-sm">
+              الأجور: ${Number(g.fee) || 0} دينار
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base" data-action="rename" data-index="${i}">إعادة تسمية</button>
+            <button type="button" class="px-2 py-1 rounded-lg border text-sm sm:text-base" data-action="editFee" data-index="${i}">تعديل الأجور</button>
+            <button type="button" class="px-2 py-1 rounded-lg bg-red-600 text-white text-sm sm:text-base" data-action="delete" data-index="${i}">حذف</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    if (els.btnManageGovs) els.btnManageGovs.addEventListener('click', openGovsModal);
+    els.btnCloseGovs.addEventListener('click', closeGovsModal);
+    els.btnAddGov.addEventListener('click', () => {
+      const name = (els.newGovName.value || '').trim();
+      const fee = Number(els.newGovFee.value);
+      if (!name) return;
+      const existingIndex = governorates.findIndex(g => (g.name || '') === name);
+      if (existingIndex === -1) {
+        governorates.push({ name, fee: Number.isFinite(fee) ? fee : 0 });
+      } else {
+        governorates[existingIndex] = { name, fee: Number.isFinite(fee) ? fee : 0 };
+      }
+      saveGovernorates();
+      renderGovsList();
+      els.newGovName.value = '';
+      els.newGovFee.value = '';
+    });
+
+    els.govsList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      const index = Number(btn.getAttribute('data-index'));
+      if (!Number.isInteger(index)) return;
+      const g = governorates[index];
+      if (!g) return;
+
+      if (action === 'rename') {
+        const newName = prompt('الاسم الجديد للمحافظة:', g.name);
+        if (!newName) return;
+        const finalName = newName.trim();
+        if (!finalName) return;
+        const dup = governorates.find((x, i) => i !== index && (x.name || '') === finalName);
+        if (dup) { alert('اسم المحافظة موجود بالفعل.'); return; }
+        governorates[index] = { ...g, name: finalName };
+        saveGovernorates();
+        renderGovsList();
+      } else if (action === 'editFee') {
+        const input = prompt('أدخل الأجور (دينار):', String(g.fee || 0));
+        if (input == null) return;
+        const fee = Number(input);
+        governorates[index] = { ...g, fee: Number.isFinite(fee) ? fee : 0 };
+        saveGovernorates();
+        renderGovsList();
+      } else if (action === 'delete') {
+        if (!confirm(`سيتم حذف المحافظة "${g.name}".`)) return;
+        governorates.splice(index, 1);
+        saveGovernorates();
+        renderGovsList();
+      }
+    });
+
+    els.grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (btn) {
+        const action = btn.getAttribute('data-action');
+        const id = Number(btn.getAttribute('data-id'));
+        const item = items.find(x => x.id === id);
+        if (action === 'edit') {
+          if (item && (item.type || 'item') === 'heading') {
+            openHeadingModal(item);
+          } else {
+            openEditModal(item);
+          }
+        } else if (action === 'delete') {
+          openConfirmDelete(id);
+        }
+        return;
+      }
+      const cardEl = e.target.closest('[data-card-id]');
+      if (cardEl) {
+        const id = Number(cardEl.getAttribute('data-card-id'));
+        const item = items.find(x => x.id === id);
+        if (!item) return;
+        if ((item.type || 'item') === 'heading') {
+          openHeadingModal(item);
+        } else {
+          openEditModal(item);
+        }
+      }
+    });
+
+    els.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = els.fName.value.trim();
+      const category = els.fCategory.value.trim();
+      const price = Number(els.fPrice.value);
+      const imageUrl = els.fImage.value.trim();
+      const description = els.fDesc.value.trim();
+
+      // قراءة الأحجام الديناميكية
+      const variants = [];
+      if (els.variantsList) {
+        const rows = els.variantsList.querySelectorAll('.variant-row');
+        rows.forEach((row, idx) => {
+          const key = row.getAttribute('data-key') || ('v' + idx);
+          const labelEl = row.querySelector('.var-label');
+          const priceEl = row.querySelector('.var-price');
+          const typeEl = row.querySelector('.var-type');
+          const label = (labelEl && labelEl.value || '').trim();
+          const priceVal = Number(priceEl && priceEl.value);
+          const variantType = (typeEl && typeEl.value || '').trim();
+          // السماح بحجم بلا اسم طالما السعر صالح
+          if (Number.isFinite(priceVal) && priceVal > 0) {
+            variants.push({ key, label, price: priceVal, variantType });
+          }
+        });
+      }
+
+      const hasVariantPrice = variants.length > 0;
+      const priceIsValid = Number.isFinite(price) && price > 0;
+      // جعل السعر العام اختياري حتى بدون أحجام
+      const minVarPrice = hasVariantPrice ? Math.min(...variants.map(v => v.price)) : null;
+      const finalPrice = Number.isFinite(minVarPrice) ? minVarPrice : (priceIsValid ? price : 0);
+
+      if (editingId != null) {
+        items = items.map(x => x.id === editingId ? { ...x, name, category, price: finalPrice, imageUrl, description, variants } : x);
+      } else {
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        items.push({ id, name, category, price: finalPrice, imageUrl, description, variants });
+      }
+
+      saveData();
+      renderItems();
+      closeEditModal();
+    });
+
+    // بدء التشغيل
+    (async () => {
+      items = await loadData();
+      categories = loadCategories();
+      categoryImages = loadCategoryImages();
+      const fromAssets = await loadCategoriesFromAssets();
+      if (Array.isArray(fromAssets) && fromAssets.length) {
+        const set = new Set(Array.isArray(categories) ? categories : []);
+        fromAssets.forEach(cat => {
+          if (typeof cat === 'string') {
+            const name = cat.trim();
+            if (name) set.add(name);
+          } else if (cat && typeof cat === 'object') {
+            const name = (cat.name || '').trim();
+            if (name) {
+              set.add(name);
+              if (cat.imageUrl && !categoryImages[name]) categoryImages[name] = cat.imageUrl;
+            }
+          }
+        });
+        categories = Array.from(set);
+        saveCategories();
+        saveCategoryImages();
+      } else if (!Array.isArray(categories) || !categories.length) {
+        categories = deriveCategoriesFromItems(items);
+        saveCategories();
+      }
+      governorates = loadGovernorates();
+      if (!governorates.length) {
+        const fromGovAssets = await loadGovernoratesFromAssets();
+        if (Array.isArray(fromGovAssets) && fromGovAssets.length) {
+          governorates = fromGovAssets;
+          saveGovernorates();
+        }
+      }
+      // تحميل إعدادات الهيرو من ملف الأصول
+      await loadHeroFromAssets();
+      renderCatTabs();
+      renderItems();
+  })();
+    async function downloadAssetsZip() {
+      const paths = ['/download/assets', '/download/assets.zip'];
+      for (const p of paths) {
+        try {
+          const resp = await fetch(p);
+          if (resp.ok) {
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'assets.zip';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            return;
+          }
+        } catch {}
+      }
+      alert('تعذّر تنزيل الأصول');
+    }
+    if (els.btnDownloadAssets) {
+      els.btnDownloadAssets.addEventListener('click', downloadAssetsZip);
+    }
+  </script>
+</body>
+</html>
